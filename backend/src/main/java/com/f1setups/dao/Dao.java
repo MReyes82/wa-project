@@ -1,0 +1,37 @@
+package com.f1setups.dao;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Map;
+
+/*
+    * Dao interface that defines an abstract API that performs
+    * CRUD operations on objects of type T.
+ */
+public interface Dao<T>
+{
+    /**
+     * get by id method definition
+     * @param id: long number retrieved from the data layer
+     * @return Optional<T> : returns an optional object for wheter the retrieval
+     * is successful or failed.
+    */
+    Optional<T> get(long id);
+    List<T> getAll();
+    void save(T entity);
+    /**
+     * PUT operation: Full resource replacement
+     * @param entity: Complete entity with all fields to replace
+     * @return Optional<T>: The updated entity, or empty if not found/failed
+     */
+    Optional<T> updateFull(T entity);
+
+    /**
+     * PATCH operation: Partial resource update
+     * @param id: ID of the entity to update
+     * @param fields: Map of field names to new values (only these fields are updated)
+     * @return boolean: true if update succeeded, false otherwise
+     */
+    boolean updatePartial(long id, Map<String, Object> fields);
+    void delete(T entity);
+}
