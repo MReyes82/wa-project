@@ -26,7 +26,7 @@ public class AuthService
      */
     public User authenticate(String email,  String password) throws Exception
     {
-        Optional<User> user = userDAO.get(3L); // Todo: implement getBy<T value> at Dao interface
+        Optional<User> user = userDAO.getBy("email", email);
         if (user.isEmpty())
         {
             throw new Exception("[AuthService] Invalid credentials");

@@ -11,26 +11,39 @@ import java.util.Map;
 public interface Dao<T>
 {
     /**
-     * get by id method definition
-     * @param id: long number retrieved from the data layer
-     * @return Optional<T> : returns an optional object for wheter the retrieval
+     * READ default operation: get by id method definition
+     * @param id long number retrieved from the data layer
+     * @return An optional object for whether the retrieval
      * is successful or failed.
     */
     Optional<T> get(long id);
+
+    /**
+     * READ custom operation, to be used by the desired Service
+     * as a method to retrieve an entity from the database with a custom parameter
+     * (different from ID)
+     * @param field column defined in the table of the entity
+     * @param value actual value to be used
+     * @return An optional object for whether the retrieval
+     * is successful or failed.
+     */
+    Optional<T> getBy(String field, String value);
+
     List<T> getAll();
     void save(T entity);
+
     /**
      * PUT operation: Full resource replacement
-     * @param entity: Complete entity with all fields to replace
-     * @return Optional<T>: The updated entity, or empty if not found/failed
+     * @param entity Complete entity with all fields to replace
+     * @return Optional of the updated entity, or empty if not found/failed
      */
     Optional<T> updateFull(T entity);
 
     /**
      * PATCH operation: Partial resource update
-     * @param id: ID of the entity to update
-     * @param fields: Map of field names to new values (only these fields are updated)
-     * @return boolean: true if update succeeded, false otherwise
+     * @param id ID of the entity to update
+     * @param fields Map of field names to new values (only these fields are updated)
+     * @return boolean true if update succeeded, false otherwise
      */
     boolean updatePartial(long id, Map<String, Object> fields);
     void delete(T entity);

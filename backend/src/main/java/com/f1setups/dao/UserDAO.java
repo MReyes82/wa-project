@@ -21,6 +21,9 @@ public class UserDAO implements Dao<User>
     private final String USERNAME = "root";
     private final String PASSWORD = "password";
 
+    // Whitelist of available fields to be used within the table definition on the schema
+    private static final List<String> allowedFields = List.of("username", "email", "password");
+
     /**
      * READ singular operation for the user implementing prepared statement safety
      * using question marks (?) guardrails for query safety
@@ -55,6 +58,47 @@ public class UserDAO implements Dao<User>
         {
             System.err.println("[UserDAO] Error in get(id): " + e.getMessage() +
                     " Returning empty object");
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> getBy(String field, String value)
+    {
+        // check for invalid arguments
+        if (value == null || value.isEmpty())
+        {
+            System.err.println("[UserDAO] Value is null or empty");
+            return Optional.empty();
+        }
+
+        if (!allowedFields.contains(field))
+        {
+            System.err.println("[UserDAO] Field not allowed: " + field);
+        }
+
+        String query = "SELECT * FROM users WHERE " + field + " = ?";
+
+        try
+        {
+            // Prepare the statement using the connection
+            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, value);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next())
+            {
+                System.err.println("[UserDAO] No such user: " + value);
+                return Optional.empty();
+            }
+
+            var user = mapRowToUser(rs);
+            return Optional.of(user);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[UserDAO] Error in getBy: " +  e.getMessage());
             return Optional.empty();
         }
     }
@@ -173,8 +217,7 @@ public class UserDAO implements Dao<User>
             System.err.println("[UserDAO] updatePartial: Fields are empty");
             return false;
         }
-        // Define whitelist to prevent injection
-        List<String> allowedFields = List.of("username", "email", "password");
+        // Check if the fields are allowed, as defined in the whitelist
         if (!isFieldsMapSafe(fields, allowedFields))
         {
             return false;
@@ -272,9 +315,9 @@ public class UserDAO implements Dao<User>
 
     /**
      * Helper function to sanitize partial (PATCH) update query
-     * @param fields: fields to be changed, passed in updatePartial() method
-     * @param allowedFields: map of allowed fields defined on the schema
-     * @return : true if all fields are valid, false if any field is not allowed
+     * @param fields fields to be changed, passed in updatePartial() method
+     * @param allowedFields map of allowed fields defined on the schema
+     * @return true if all fields are valid, false if any field is not allowed
      */
     private static boolean isFieldsMapSafe(Map<String, Object> fields, List<String> allowedFields)
     {

@@ -8,7 +8,9 @@ public class LoginResponse
 
     public LoginResponse()
     {
-
+        success = false;
+        message = "";
+        userId = 0;
     }
     public LoginResponse(boolean success, String message, int usedId)
     {

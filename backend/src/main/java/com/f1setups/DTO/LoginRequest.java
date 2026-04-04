@@ -6,7 +6,11 @@ public class LoginRequest
     public String password;
 
     // empty and full constructors
-    public LoginRequest() {}
+    public LoginRequest()
+    {
+        email = "";
+        password = "";
+    }
     public LoginRequest(String email, String password)
     {
         this.email = email;
