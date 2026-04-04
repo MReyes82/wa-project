@@ -25,7 +25,7 @@ public class UserDAO implements Dao<User>
      * READ singular operation for the user implementing prepared statement safety
      * using question marks (?) guardrails for query safety
      * @param id : ID retrieved
-     * @return user : user retrieved by the query
+     * @return Optional<User> : user retrieved by the query
      */
     @Override
     public Optional<User> get(long id)
