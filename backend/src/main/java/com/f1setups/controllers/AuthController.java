@@ -26,7 +26,20 @@ public class AuthController implements HttpHandler
         this.gson = new Gson();
     }
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
+    public void handle(HttpExchange httpExchange) throws IOException
+    {
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+        if ("OPTIONS".equalsIgnoreCase(httpExchange.getRequestMethod()))
+        {
+            // Send a 204 (No Content) status code and immediately return.
+            // We don't need to process any data, we just needed to send the headers above.
+            httpExchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
         // only allow POST here since it's login
         if (!("POST".equalsIgnoreCase(httpExchange.getRequestMethod())))
         {
