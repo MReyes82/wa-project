@@ -4,7 +4,7 @@ public class LoginResponse
 {
     public boolean success;
     public String message;
-    public int usedId;
+    public int userId;
 
     public LoginResponse()
     {
@@ -14,6 +14,6 @@ public class LoginResponse
     {
         this.success = success;
         this.message = message;
-        this.usedId = usedId;
+        this.userId = usedId;
     }
 }
