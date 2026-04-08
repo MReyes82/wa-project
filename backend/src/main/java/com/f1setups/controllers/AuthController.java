@@ -1,5 +1,7 @@
 package com.f1setups.controllers;
 
+import com.f1setups.DTO.SignInRequest;
+import com.f1setups.DTO.SignInResponse;
 import com.f1setups.models.User;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -13,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.http.HttpResponse;
 
 public class AuthController implements HttpHandler
 {
@@ -49,7 +50,21 @@ public class AuthController implements HttpHandler
             return;
         }
 
-        LoginRequest loginRequest = parseRequest(httpExchange);
+        // Get the path to know where to route
+        String path = httpExchange.getRequestURI().getPath();
+        if ("/api/auth/register".equalsIgnoreCase(path))
+        {
+            register(httpExchange);
+        }
+        else if ("/api/auth/login".equalsIgnoreCase(path))
+        {
+            login(httpExchange);
+        }
+    }
+
+    private void login(HttpExchange httpExchange) throws IOException
+    {
+        LoginRequest loginRequest = parseLoginRequest(httpExchange);
         try
         {
             // call to the service
@@ -79,15 +94,52 @@ public class AuthController implements HttpHandler
         }
     }
 
-    public LoginRequest parseRequest(HttpExchange httpExchange)
+    private void register(HttpExchange httpExchange) throws IOException
+    {
+        SignInRequest signInRequest = parseSingInRequest(httpExchange);
+        try
+        {
+            User newUser = authService.registerUser(
+                    signInRequest.username,
+                    signInRequest.email,
+                    signInRequest.password);
+
+            var signInResponse = new SignInResponse(true, "User registered successfully", newUser.getId());
+            String json = gson.toJson(signInResponse);
+            // Send 200 ok response
+            httpExchange.getResponseHeaders().add("Content-Type", "application/json");
+            httpExchange.sendResponseHeaders(200, 0);
+            // log to the output stream
+            OutputStream os = httpExchange.getResponseBody();
+            os.write(json.getBytes());
+            os.close();
+        }
+        catch (Exception e)
+        {
+            System.err.println("[AuthController] error handling register request: " + e.getMessage());
+            var signInResponse = new SignInResponse(false, "Register unsuccessful", -1);
+            String json = gson.toJson(signInResponse);
+            httpExchange.sendResponseHeaders(401, 0);
+            OutputStream os = httpExchange.getResponseBody();
+            os.write(json.getBytes());
+            os.close();
+        }
+    }
+
+    private LoginRequest parseLoginRequest(HttpExchange httpExchange)
     {
         // get the stream from the Http body
         InputStream inputStream = httpExchange.getRequestBody();
         // We wrap it into a reader
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        // Call gson to parse it
-        var loginRequest = gson.fromJson(inputStreamReader, LoginRequest.class);
-        // and we return it
-        return loginRequest;
+        // Call gson to parse it and return it
+        return gson.fromJson(inputStreamReader, LoginRequest.class);
+    }
+
+    private SignInRequest parseSingInRequest(HttpExchange httpExchange)
+    {
+        InputStream inputStream = httpExchange.getRequestBody();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        return gson.fromJson(inputStreamReader, SignInRequest.class);
     }
 }

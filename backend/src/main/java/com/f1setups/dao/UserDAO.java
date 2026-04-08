@@ -144,9 +144,9 @@ public class UserDAO implements Dao<User>
         @param user: User object created by the controller.
      */
     @Override
-    public void save(@NotNull User user)
+    public Optional<User> save(@NotNull User user)
     {
-        String query = "INSERT INTO users (username,email,password) VALUES (?,?,?)";
+        String query = "INSERT INTO users (username,email,password, salt) VALUES (?,?,?,?)";
 
         try
         {
@@ -157,14 +157,16 @@ public class UserDAO implements Dao<User>
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
             ps.setString(3,  user.getPassword());
+            ps.setString(4, user.getSalt());
             // compute rows affected to know if the query was successful
             int rowsAffected = ps.executeUpdate();
             System.out.println("[UserDAO] Rows affected after INSERT query" + rowsAffected);
-
+            return getBy("email", user.getEmail());
         }
         catch (SQLException e)
         {
             System.err.println("[UserDAO] Error in saving user" + e.getMessage());
+            return Optional.empty();
         }
     }
 
@@ -176,7 +178,7 @@ public class UserDAO implements Dao<User>
     @Override
     public Optional<User> updateFull(User user)
     {
-        String query = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
+        String query = "UPDATE users SET username=?, email=?, password=?, salt=? WHERE id=?";
 
         try {
             Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
@@ -184,7 +186,8 @@ public class UserDAO implements Dao<User>
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
-            ps.setLong(4, user.getId());
+            ps.setString(4, user.getSalt());
+            ps.setLong(5, user.getId());
             int rowsAffected = ps.executeUpdate();
 
             if (rowsAffected < 1)
@@ -309,8 +312,9 @@ public class UserDAO implements Dao<User>
         String username = rs.getString("username");
         String email = rs.getString("email");
         String password = rs.getString("password");
+        String salt = rs.getString("salt");
 
-        return new User((int) id, username, email, password);
+        return new User((int) id, username, email, password,  salt);
     }
 
     /**

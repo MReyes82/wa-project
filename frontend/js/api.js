@@ -10,7 +10,7 @@ async function loginUser(email, password)
     try
     {
         // Create the fetch call
-        const response = await fetch('http://localhost:8080/login',
+        const response = await fetch('http://localhost:8080/api/auth',
             {
                 method: 'POST',
                 headers: {
@@ -34,4 +34,16 @@ async function loginUser(email, password)
         console.error("Network or server error:", error);
         throw error; // Re-throw the error to be handled by the caller
     }
+}
+// TODO: add username field to the index.html
+async function registerUser(username, email, password)
+{
+    const payload =
+    {
+        username: username,
+        email: email,
+        password: password,
+    }
+
+
 }

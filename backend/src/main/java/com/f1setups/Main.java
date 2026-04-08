@@ -17,7 +17,7 @@ public class Main
         var authController = new AuthController(authService);
 
         HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        server.createContext("/login", authController);
+        server.createContext("/api/auth", authController);
         server.setExecutor(null);
         server.start();
         System.out.println("[Main] HTTP Server started on http://localhost:8080");

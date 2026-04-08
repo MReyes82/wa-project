@@ -30,21 +30,32 @@ public interface Dao<T>
     Optional<T> getBy(String field, String value);
 
     List<T> getAll();
-    void save(T entity);
 
     /**
-     * PUT operation: Full resource replacement
+     * POST operation
+     * @param entity
+     * @return Optional of value <T> to return after creation.
+     */
+    Optional<T> save(T entity);
+
+    /**
+     * UPDATE/PUT operation: Full resource replacement
      * @param entity Complete entity with all fields to replace
      * @return Optional of the updated entity, or empty if not found/failed
      */
     Optional<T> updateFull(T entity);
 
     /**
-     * PATCH operation: Partial resource update
+     * UPDATE/PATCH operation: Partial resource update
      * @param id ID of the entity to update
      * @param fields Map of field names to new values (only these fields are updated)
      * @return boolean true if update succeeded, false otherwise
      */
     boolean updatePartial(long id, Map<String, Object> fields);
+
+    /**
+     * DELETE operation: remove the entity from the database
+     * @param entity element to be removed
+     */
     void delete(T entity);
 }

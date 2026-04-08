@@ -3,6 +3,7 @@ package com.f1setups.services;
 import com.f1setups.DTO.*;
 import com.f1setups.dao.*;
 import com.f1setups.models.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 
@@ -17,12 +18,13 @@ public class AuthService
     }
 
     /**
-     * Main call for the authentication service, uses the UserDAO instance
+     * Function for the login system, uses the UserDAO instance
      * defined in the class' attributes for the query handling.
-     * @param email : email of the login request passed from the frontend
-     * @param password : password of the login request passed from the frontend.
-     * @return User: oject of the authenticated user only if a successful authentication.
-     * @throws Exception :
+     * and checks if the stored hashed password matches the password passed as argument + the stored salt
+     * @param email email of the login request passed from the frontend
+     * @param password password of the login request passed from the frontend.
+     * @return User object of the authenticated user only if a successful authentication.
+     * @throws Exception if the login auth fails
      */
     public User authenticate(String email,  String password) throws Exception
     {
@@ -32,14 +34,57 @@ public class AuthService
             throw new Exception("[AuthService] Invalid credentials");
         }
 
-        if (user.get().getEmail().equals(email) && user.get().getPassword().equals(password))
+        var retrievedUser = user.get();
+        if (BCrypt.checkpw(password + retrievedUser.getSalt(), retrievedUser.getPassword()))
         {
-            return user.get();
+            return retrievedUser; // return User object in the Optional if successful login
         }
 
         else
         {
             throw new Exception("[AuthService] Invalid credentials");
         }
+    }
+
+    /**
+     * Function of the sign-in system, used the userDAO instance to handle the query.
+     * Checks whether the user already exists and the password is strong enough
+     * then it generates a salt and hashes the password before sending the object
+     * to the DAO
+     * @param username username of the signIn request passed from the frontend
+     * @param email email of the signIn request passed from the frontend
+     * @param password password of the signIn request passed from the frontend
+     * @return User object of the new user only if a successful sign-in.
+     * @throws Exception If the Sign-in fails
+     */
+    public User registerUser(String username, String email, String password) throws Exception
+    {
+        // First check if user already exists in database
+        Optional <User> user = userDAO.getBy("email", email);
+
+        if (user.isPresent())
+        {
+            throw new Exception("[AuthService] User already exists");
+        }
+
+        // Verify if the password is strong enough
+        if (password.length() < 6)
+        {
+            throw new Exception("[AuthService] Password too short");
+        }
+        // Now we hash and salt the password
+        String salt = BCrypt.gensalt();
+        String hashedPassword = BCrypt.hashpw(password, salt);
+        // User object to store the data temporary and send it to the DAO
+        var newUser = new User(-1, username, email, hashedPassword, salt);
+        // store the result of the new user after the save() call.
+        var updateUser = userDAO.save(newUser);
+        // check if operation failed
+        if (updateUser.isEmpty())
+        {
+            throw new Exception("[AuthService] Failed to save user");
+        }
+        // return the new user from the Optional object returned after the successful query
+        return updateUser.get();
     }
 }

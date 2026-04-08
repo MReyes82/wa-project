@@ -1,4 +1,7 @@
 package com.f1setups.models;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 /*
     * This class represents a user in the system. It contains the user's id, username, password and email.
     * Currently, password attribute it's being handled raw, for simplicity
@@ -10,13 +13,15 @@ public class User
     public String username;
     public String email;
     public String password;
+    public String salt;
 
-    public User(int id, String username, String email, String password)
+    public User(int id, String username, String email, String password, String salt)
     {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.salt = salt;
     }
 
     public  int getId()
@@ -35,6 +40,10 @@ public class User
     public String getPassword()
     {
         return password;
+    }
+    public String getSalt()
+    {
+        return salt;
     }
 
     @Override

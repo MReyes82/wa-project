@@ -7,20 +7,38 @@
     </head>
 
     <body>
-    <div id="login-section">
-        <h2>Log in</h2>
-        <form id="login-form">
-            <div>
-                <label for="email-input">Email: </label>
-                <input type="email" id="email-input" required>
-            </div>
-            <div>
-                <label for="password-input">Password: </label>
-                <input type="password" id="password-input" required>
-            </div>
-            <button type="submit">Log-in</button>
-        </form>
-        <div id="login-message"></div>
+    <div class="auth-container" id="auth-section">
+        <div class="auth-card">
+            <h2 id="auth-title">Welcome F1 Setups</h2>
+
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="email-input">Email</label>
+                    <input type="email" id="email-input" required>
+                </div>
+                <div class="input-group">
+                    <label for="password-input">Password</label>
+                    <input type="password" id="password-input" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="toggle-text">Need an account? <span id="show-register">Sign Up</span></p>
+            </form>
+
+            <form id="register-form" class="auth-form" style="display: none;">
+                <div class="input-group">
+                    <label for="reg-email-input">Email</label>
+                    <input type="email" id="reg-email-input" required>
+                </div>
+                <div class="input-group">
+                    <label for="reg-password-input">Password</label>
+                    <input type="password" id="reg-password-input" required minlength="6">
+                </div>
+                <button type="submit" class="btn-primary">Create Account</button>
+                <p class="toggle-text">Already have a seat? <span id="show-login">Login</span></p>
+            </form>
+
+            <div id="auth-message" class="message"></div>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
