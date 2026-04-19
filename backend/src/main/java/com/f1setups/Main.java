@@ -21,6 +21,6 @@ public class Main
         server.setExecutor(null);
         server.start();
         System.out.println("[Main] HTTP Server started on http://localhost:8080");
-        System.out.println("[Main] Login endpoing: POST http://localhost:8080/login");
+        System.out.println("[Main] Login endpoint: POST http://localhost:8080/api/auth");
     }
 }
