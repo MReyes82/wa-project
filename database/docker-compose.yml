@@ -1,6 +1,4 @@
 # Docker compose file for the MYSQL server
-
-version: "3.7"
 services:
   mysql:
     image: mysql:5.7

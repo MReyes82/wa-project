@@ -1,5 +1,6 @@
 package com.f1setups.models;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /*
@@ -20,7 +21,7 @@ public class Setup
     private SessionType sessionType; // value of the enum
     private ControllerType controllerType;  // value of the enum
     private Boolean isWetWeather; // if the record is marked for wet weather
-    private Date createdAt; // date of creation of the record
+    private LocalDateTime createdAt; // date of creation of the record
     // Setup fields
     // Aero
     private int frontWing;
@@ -50,7 +51,7 @@ public class Setup
     private float rearRightPressure;
     private float rearLeftPressure;
 
-    public Setup(int id, int userId, int gameVersionId, int trackId, int teamId, String title, String annotation, SessionType sessionType, ControllerType controllerType, Boolean isWetWeather, Date createdAt, int frontWing, int rearWing, int diffOnThrottle, int diffOffThrottle, int engineBraking, float frontCamber, float rearCamber, float frontToe, float rearToe, int frontSuspension, int rearSuspension, int frontAntiRollBar, int rearAntiRollBar, int frontRideHeight, int rearRideHeight, int brakePressure, int brakeBias, float frontRightPressure, float frontLeftPressure, float rearRightPressure, float rearLeftPressure) {
+    public Setup(int id, int userId, int gameVersionId, int trackId, int teamId, String title, String annotation, SessionType sessionType, ControllerType controllerType, Boolean isWetWeather, LocalDateTime createdAt, int frontWing, int rearWing, int diffOnThrottle, int diffOffThrottle, int engineBraking, float frontCamber, float rearCamber, float frontToe, float rearToe, int frontSuspension, int rearSuspension, int frontAntiRollBar, int rearAntiRollBar, int frontRideHeight, int rearRideHeight, int brakePressure, int brakeBias, float frontRightPressure, float frontLeftPressure, float rearRightPressure, float rearLeftPressure) {
         this.id = id;
         this.userId = userId;
         this.gameVersionId = gameVersionId;
@@ -125,7 +126,7 @@ public class Setup
         return isWetWeather;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
@@ -253,7 +254,7 @@ public class Setup
         isWetWeather = wetWeather;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
