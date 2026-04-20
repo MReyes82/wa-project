@@ -1,7 +1,6 @@
 package com.f1setups.dao;
 
 import com.f1setups.models.User;
-import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -12,15 +11,14 @@ import java.util.Optional;
 
 /*
     * This class handles the User CRUD operations.
-    * Has the static connection for now
+    * It implements the Dao interface and provides implementations for the CRUD methods.
+    * It uses prepared statements to prevent SQL injection and ensure query safety.
+    * The getBy method allows retrieval of a user by a specific field (e.g., email or username) with input sanitization.
+    * Uses the DatabaseUtil to obtain the connection to the database
  */
 
 public class UserDAO implements Dao<User>
 {
-    private final String URL = "jdbc:mysql://localhost:3306/f1setups";
-    private final String USERNAME = "root";
-    private final String PASSWORD = "password";
-
     // Whitelist of available fields to be used within the table definition on the schema
     private static final List<String> allowedFields = List.of("username", "email", "password");
 
@@ -34,11 +32,15 @@ public class UserDAO implements Dao<User>
     public Optional<User> get(long id)
     {
         String query = "SELECT * FROM users WHERE id = ?";
-        try
+        // try with resources to ensure proper closing of the connection and prevent leaks
+        // the prepared statement is also included in the try with resources to ensure it is closed properly
+        // the result set in included in the PreparedStatement cleanup although not
+        // in the try-with-resources block
+        try (Connection con = DatabaseUtil.getConnection();
+             // Prepare the statement using the connection
+             PreparedStatement ps = con.prepareStatement(query))
         {
-            // Prepare the statement using the connection
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
+            // and replace the ? safely
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
 
@@ -71,19 +73,16 @@ public class UserDAO implements Dao<User>
             System.err.println("[UserDAO] Value is null or empty");
             return Optional.empty();
         }
-
+        // Sanitization before appending to the query
         if (!allowedFields.contains(field))
         {
             System.err.println("[UserDAO] Field not allowed: " + field);
         }
 
         String query = "SELECT * FROM users WHERE " + field + " = ?";
-
-        try
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);)
         {
-            // Prepare the statement using the connection
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, value);
             ResultSet rs = ps.executeQuery();
 
@@ -114,14 +113,12 @@ public class UserDAO implements Dao<User>
         String query = "SELECT * FROM users";
         List<User> users = new ArrayList<>();
 
-        try
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);)
         {
-            // Prepare the statement using the connection
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next())
+            while (rs.next()) // while there are still users to be retrieved from the result set
             {
                 // map the current user
                 User user = mapRowToUser(rs);
@@ -148,11 +145,9 @@ public class UserDAO implements Dao<User>
     {
         String query = "INSERT INTO users (username,email,password, salt) VALUES (?,?,?,?)";
 
-        try
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);)
         {
-            // Prepare the statement using the connection
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
             // replace the ? safely
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
@@ -180,9 +175,9 @@ public class UserDAO implements Dao<User>
     {
         String query = "UPDATE users SET username=?, email=?, password=?, salt=? WHERE id=?";
 
-        try {
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
+        try (Connection con = DatabaseUtil.getConnection();
+            PreparedStatement ps = con.prepareStatement(query);)
+        {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
@@ -210,7 +205,7 @@ public class UserDAO implements Dao<User>
      * PATCH operation: Partial update - updates only specified fields
      * @param id: ID of user to update
      * @param fields: Map of field names to new values (valid keys: "username", "email", "password")
-     * @return boolean: true if update succeeded, false otherwise
+     * @return boolean: true if update succeeded, false otherwise or if the fields map is invalid (empty or contains disallowed fields)
      */
     @Override
     public boolean updatePartial(long id, Map<String, Object> fields)
@@ -221,8 +216,9 @@ public class UserDAO implements Dao<User>
             return false;
         }
         // Check if the fields are allowed, as defined in the whitelist
-        if (!isFieldsMapSafe(fields, allowedFields))
+        if (!isFieldsMapSafe(fields))
         {
+            System.err.println("[UserDAO] updatePartial: Fields are not safe for update");
             return false;
         }
 
@@ -242,11 +238,9 @@ public class UserDAO implements Dao<User>
         query.append(" WHERE id = ?"); // end the query
         params.add(id);
 
-        try
+        try (Connection con = DatabaseUtil.getConnection();
+            PreparedStatement ps = con.prepareStatement(query.toString());)
         {
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query.toString());
-
             // Attach the parameters once they're ready into the query
             for (int i = 0; i < params.size(); i++)
                 ps.setObject(i + 1, params.get(i)); //
@@ -280,11 +274,9 @@ public class UserDAO implements Dao<User>
     public void delete(User user)
     {
         String query = "DELETE FROM users WHERE id = ?";
-        try
+        try (Connection con = DatabaseUtil.getConnection();
+            PreparedStatement ps = con.prepareStatement(query);)
         {
-            // Prepare the statement using the connection
-            Connection con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = con.prepareStatement(query);
             ps.setLong(1, user.getId());
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected < 1)
@@ -319,16 +311,16 @@ public class UserDAO implements Dao<User>
 
     /**
      * Helper function to sanitize partial (PATCH) update query
+     *
      * @param fields fields to be changed, passed in updatePartial() method
-     * @param allowedFields map of allowed fields defined on the schema
      * @return true if all fields are valid, false if any field is not allowed
      */
-    private static boolean isFieldsMapSafe(Map<String, Object> fields, List<String> allowedFields)
+    private static boolean isFieldsMapSafe(Map<String, Object> fields)
     {
         // Check if all the provided fields are valid
         for (var field : fields.keySet())
         {
-            if (!allowedFields.contains(field))
+            if (!UserDAO.allowedFields.contains(field))
             {
                 System.err.println("[UserDAO] updatePartial: Field {" + field + "} is not allowed, aborting operation");
                 return false;
