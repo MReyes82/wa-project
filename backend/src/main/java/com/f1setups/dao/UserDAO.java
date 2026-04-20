@@ -77,6 +77,7 @@ public class UserDAO implements Dao<User>
         if (!allowedFields.contains(field))
         {
             System.err.println("[UserDAO] Field not allowed: " + field);
+            return Optional.empty();
         }
 
         String query = "SELECT * FROM users WHERE " + field + " = ?";
@@ -114,10 +115,9 @@ public class UserDAO implements Dao<User>
         List<User> users = new ArrayList<>();
 
         try (Connection con = DatabaseUtil.getConnection();
-             PreparedStatement ps = con.prepareStatement(query);)
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery())
         {
-            ResultSet rs = ps.executeQuery();
-
             while (rs.next()) // while there are still users to be retrieved from the result set
             {
                 // map the current user

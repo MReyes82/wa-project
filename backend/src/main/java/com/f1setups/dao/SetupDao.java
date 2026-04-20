@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,15 +79,78 @@ public class SetupDao implements Dao<Setup>
             return Optional.empty();
         }
     }
+
+    /**
+     * READ singular operation for the Setup entity, retrieves a single record
+     * from the database with a specified field and value and maps it to a Setup object.
+     * Only after checking that the field is valid and exists in the table definition of the schema,
+     * Uses ? guardrail for the query for both the field and value parameters
+     * @param field column defined in the table of the entity
+     * @param value actual value to be used
+     * @return An optional object for whether the retrieval is successful or failed.
+     */
     @Override
     public Optional<Setup> getBy(String field, String value)
     {
-        return Optional.empty();
+        // Check for invalid arguments
+        if (value == null || value.isEmpty())
+        {
+            System.err.println("[SetupDao] getBy failed: value cannot be null or empty. Returning empty object");
+            return Optional.empty();
+        }
+
+        if (!allowedFields.contains(field))
+        {
+            System.err.println("[SetupDao] getBy failed: field is not allowed: " + field);
+            return  Optional.empty();
+        }
+
+        String query = "SELECT * FROM setup WHERE ? = ?";
+        try (Connection con = DatabaseUtil.getConnection();
+            PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setString(1, field);
+            ps.setString(2, value);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next())
+            {
+                System.err.println("[SetupDao] getBy failed: no setup found with value: " + value);
+                return Optional.empty();
+            }
+
+            var setup =  mapRowToSetup(rs);
+            return Optional.of(setup);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] getBy failed: " + e.getMessage());
+            return Optional.empty();
+        }
     }
     @Override
     public List<Setup> getAll()
     {
-        return List.of();
+        String query = "SELECT * FROM setup";
+        List<Setup> setups = new ArrayList<>();
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery())
+        {
+            while (rs.next()) // while there are still setups to be retrieved from the result set
+            {
+                // map the current setup
+                Setup setup = mapRowToSetup(rs);
+                setups.add(setup);
+            }
+            return setups;
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] getAll failed: " + e.getMessage());
+            return setups;
+        }
     }
     @Override
     public Optional<Setup> save(@NotNull Setup setup)
