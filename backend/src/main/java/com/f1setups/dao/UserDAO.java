@@ -166,7 +166,7 @@ public class UserDAO implements Dao<User>
     }
 
     /**
-     * PUT operation: Full update - replace all user fields
+     * UPDATE operation: Full update - replace all user fields
      * @param user: New User object with all fields to update
      * @return Optional<User>: The updated user if successful, empty if failed.
      */
@@ -202,7 +202,7 @@ public class UserDAO implements Dao<User>
     }
 
     /**
-     * PATCH operation: Partial update - updates only specified fields
+     * UPDATE operation: Partial update - updates only specified fields
      * @param id: ID of user to update
      * @param fields: Map of field names to new values (valid keys: "username", "email", "password")
      * @return boolean: true if update succeeded, false otherwise or if the fields map is invalid (empty or contains disallowed fields)
