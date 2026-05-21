@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS team (
 );
 
 -- Add the game versions contemplated by the business logic to the game table.
-INSERT INTO game (release_year) VALUES (2021), (2022), (2023), (2024);
+INSERT INTO game (release_year) VALUES (2022), (2023), (2024), (2025);
 
 -- Add the tracks contemplated by the business logic to the track table.
 INSERT INTO track (name, country) VALUES
