@@ -5,29 +5,26 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 /*
     * Class to manage the database connection pools
     * Provides centralized connection management for all Dao Classes.
  */
 public class DatabaseUtil
 {
-    private static final HikariDataSource dataSource;
+    /**
+     * Lazily initialized pool to avoid creating connections during class loading.
+     */
+    private static volatile HikariDataSource dataSource;
+    /**
+     * Indirection layer to allow tests to provide a mock connection source.
+     */
+    private static ConnectionProvider connectionProvider = DatabaseUtil::getPooledConnection;
 
-    // Static initializer block to ensure one set up across the runtime
-    static
+    @FunctionalInterface
+    interface ConnectionProvider
     {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/f1setups");
-        config.setUsername("root");
-        config.setPassword("password");
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(5);
-        config.setConnectionTimeout(30000); // 30 seconds
-        config.setIdleTimeout(600000); // 10 minutes
-        config.setMaxLifetime(1800000); // 30 minutes
-        config.setAutoCommit(true);
-
-        dataSource = new HikariDataSource(config);
+        Connection get() throws SQLException;
     }
 
     /**
@@ -37,7 +34,65 @@ public class DatabaseUtil
      */
     public static Connection getConnection() throws SQLException
     {
-        return dataSource.getConnection();
+        return connectionProvider.get();
+    }
+
+    /**
+     * Test hook to override the connection source for DAO tests.
+     * @param provider custom provider for connections
+     */
+    static void setConnectionProvider(ConnectionProvider provider)
+    {
+        connectionProvider = provider != null ? provider : DatabaseUtil::getPooledConnection;
+    }
+
+    /**
+     * Restore the default pooled connection provider after tests.
+     */
+    static void resetConnectionProvider()
+    {
+        connectionProvider = DatabaseUtil::getPooledConnection;
+    }
+
+    /**
+     * Get a connection from the lazily initialized pool.
+     * @return pooled connection
+     * @throws SQLException if connection cannot be established
+     */
+    private static Connection getPooledConnection() throws SQLException
+    {
+        return getDataSource().getConnection();
+    }
+
+    /**
+     * Initialize and return the shared Hikari data source.
+     * @return shared data source
+     */
+    private static HikariDataSource getDataSource()
+    {
+        if (dataSource == null)
+        {
+            synchronized (DatabaseUtil.class)
+            {
+                if (dataSource == null)
+                {
+                    HikariConfig config = new HikariConfig();
+                    config.setJdbcUrl("jdbc:mysql://localhost:3306/f1setups");
+                    config.setUsername("root");
+                    config.setPassword("password");
+                    config.setMaximumPoolSize(10);
+                    config.setMinimumIdle(5);
+                    config.setConnectionTimeout(30000); // 30 seconds
+                    config.setIdleTimeout(600000); // 10 minutes
+                    config.setMaxLifetime(1800000); // 30 minutes
+                    config.setAutoCommit(true);
+
+                    dataSource = new HikariDataSource(config);
+                }
+            }
+        }
+
+        return dataSource;
     }
 
     /**

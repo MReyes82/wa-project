@@ -105,12 +105,11 @@ public class SetupDao implements Dao<Setup>
             return  Optional.empty();
         }
 
-        String query = "SELECT * FROM setup WHERE ? = ?";
+        String query = "SELECT * FROM setup WHERE " + field + " = ?";
         try (Connection con = DatabaseUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(query))
         {
-            ps.setString(1, field);
-            ps.setString(2, value);
+            ps.setString(1, value);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next())
@@ -270,7 +269,7 @@ public class SetupDao implements Dao<Setup>
             return false;
         }
 
-        StringBuilder query = new StringBuilder("UPDATE set ");
+        StringBuilder query = new StringBuilder("UPDATE setup SET ");
         List<Object> params = new ArrayList<>();
         // 0-begin index in order to account for the first element of the query to use correct syntax
         int fieldCount = 0;
@@ -282,7 +281,7 @@ public class SetupDao implements Dao<Setup>
             params.add(fields.get(field)); // add fields element to the parameters for the actual query
             fieldCount++;
         }
-        query.append(" where id = ?"); // end the query
+        query.append(" WHERE id = ?");
         params.add(id);
 
         try (Connection con = DatabaseUtil.getConnection();
