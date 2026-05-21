@@ -34,6 +34,56 @@ CREATE TABLE IF NOT EXISTS team (
     PRIMARY KEY (id)
 );
 
+-- Add the game versions contemplated by the business logic to the game table.
+INSERT INTO game (release_year) VALUES (2021), (2022), (2023), (2024);
+
+-- Add the tracks contemplated by the business logic to the track table.
+INSERT INTO track (name, country) VALUES
+('Bahrain GP', 'Bahrain'),
+('Chinese GP', 'China'),
+('Japanese GP', 'Japan'),
+('Saudi Arabian GP', 'Saudi Arabia'),
+('Imola GP', 'Italy'),
+('Australian GP', 'Australia'),
+('Azerbaijan GP', 'Azerbaijan'),
+('Miami GP', 'USA'),
+('Spanish GP', 'Spain'),
+('Monaco GP', 'Monaco'),
+('United States GP', 'USA'),
+('Canadian GP', 'Canada'),
+('Austrian GP', 'Austria'),
+('British GP', 'United Kingdom'),
+('French GP', 'France'),
+('Hungarian GP', 'Hungary'),
+('Belgian GP', 'Belgium'),
+('Dutch GP', 'Netherlands'),
+('Italian GP', 'Italy'),
+('Mexican GP', 'Mexico'),
+('Brazilian GP', 'Brazil'),
+('Las Vegas GP', 'USA'),
+('Singapore GP', 'Singapore'),
+('Qatar GP', 'Qatar'),
+('Abu Dhabi GP', 'United Arab Emirates');
+
+-- Add the teams contemplated by the business logic to the team table.
+INSERT INTO team (name) VALUES
+('Mercedes'),
+('Red Bull Racing'),
+('Ferrari'),
+('McLaren'),
+('Alpine'),
+('AlphaTauri'),
+('Aston Martin'),
+('Williams'),
+('Alfa Romeo'),
+('Haas'),
+('Sauber'),
+('VCARB'),
+('ApxGp'),
+('Konnersport'),
+('Cadillac'),
+('My team');
+
 -- Setup metadata table, storing additional information about each setup, such as the title, description, and creation date. This allows users to provide more context about their setups and helps other users find relevant setups based on their preferences.
 -- pending
 
