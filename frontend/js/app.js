@@ -17,11 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
             appRoot.innerHTML = htmlString;
 
             // Re-attach event listeners based on which page just loaded
-            if (pageName === 'auth') {
-                initAuthLogic();
-            } else if (pageName === 'dashboard') {
+            // and return the correct initialization function
+            if (pageName === "landing")
+                initLandingLogic()
+            else if (pageName === "game-select")
+                initGameSelectLogic()
+            else if (pageName === "track-select")
+                initTrackSelectLogic()
+            else if (pageName === "dashboard")
                 initDashboardLogic();
-            }
+            else if (pageName === "auth")
+                initAuthLogic();
+
         } catch (error) {
             console.error("Failed to load page:", error);
             appRoot.innerHTML = "<h2>Error loading module.</h2>";
@@ -34,12 +41,72 @@ document.addEventListener('DOMContentLoaded', () => {
         if (token) {
             navigateTo('dashboard');
         } else {
-            navigateTo('auth');
+            navigateTo('landing');
+        }
+    }
+
+    // --- STATE MACHINE ROUTER ---
+    function routeUser() {
+        const gameId = localStorage.getItem('f1_game_id');
+        const trackId = localStorage.getItem('f1_track_id');
+        const userId = localStorage.getItem('f1_user_id');
+
+        // If they have everything selected, show the setups
+        if (gameId && trackId) {
+            navigateTo('dashboard');
+        }
+        // If they have a game but no track, show tracks
+        else if (gameId) {
+            navigateTo('track-select');
+        }
+        // Otherwise, show the landing page
+        else {
+            navigateTo('landing');
         }
     }
 
     // --- Page-Specific Logic Initializes ---
     // These must be attached after the HTML is injected to avoid losing old event listeners
+    function initLandingLogic() {
+        document.getElementById('btn-browse').addEventListener('click', () => {
+            navigateTo('game-select');
+        });
+        document.getElementById('btn-login-route').addEventListener('click', () => {
+            navigateTo('auth');
+        });
+    }
+
+    function initGameSelectLogic() {
+        const buttons = document.querySelectorAll('.game-select-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                // Extract the DB ID from the HTML attribute
+                const selectedGameId = event.target.getAttribute('data-id');
+                // Save it to memory
+                localStorage.setItem('f1_game_id', selectedGameId);
+                // Re-run the router (it will see the game and push them to track-select)
+                routeUser();
+            });
+        });
+    }
+
+    function initTrackSelectLogic() {
+        // Back button to change game
+        document.getElementById('btn-back-game').addEventListener('click', () => {
+            localStorage.removeItem('f1_game_id'); // Clear the state
+            routeUser(); // Router kicks them back to game-select
+        });
+
+        const buttons = document.querySelectorAll('.track-select-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const selectedTrackId = event.target.getAttribute('data-id');
+                localStorage.setItem('f1_track_id', selectedTrackId);
+                routeUser(); // Router kicks them to the dashboard!
+            });
+        });
+    }
+
     function initAuthLogic() {
         // Grab the elements of the form now, because now they exist in the DOM
         const loginForm = document.getElementById('login-form');
@@ -109,16 +176,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initDashboardLogic()
-    {
+    function initDashboardLogic() {
         // Grab the elements only after dashboard.html is injected
-        document.getElementById('logout-button').addEventListener('click', () =>
-        {
+        document.getElementById('logout-button').addEventListener('click', () => {
             localStorage.removeItem('f1_user_id');
             checkAuthState();
         });
+        // Easy way to allow changing tracks from the dashboard
+        // Add a button with id 'btn-change-track' to the dashboard.html sidebar to use this feature
+        const changeTrackBtn = document.getElementById('btn-change-track');
+        if (changeTrackBtn) {
+            changeTrackBtn.addEventListener('click', () => {
+                localStorage.removeItem('f1_track_id');
+                routeUser();
+            });
+        }
     }
 
-    // --- Kick off the app ---
-    checkAuthState();
+    // --- Kick off the app --
+    routeUser();
 });
