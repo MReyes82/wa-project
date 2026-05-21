@@ -9,7 +9,9 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SetupController implements HttpHandler
 {
@@ -44,23 +46,40 @@ public class SetupController implements HttpHandler
             httpExchange.close();
             return;
         }
-        getDefaultSetups(httpExchange);
         /*String path = httpExchange.getRequestURI().getPath();
         if ("/api/setups".equalsIgnoreCase(path))
         {
             getDefaultSetups(httpExchange);
         }*/
-
+        // Grab the raw query from the URI, we will parse it in the service layer
+        String query = httpExchange.getRequestURI().getQuery();
+        // Parse into the Map
+        Map<String, String> params = parseQueryParams(query);
+        String gameVersionIdStr = params.get("gameId");
+        String trackIdStr = params.get("trackId");
+        // Send bad request error if provided params are invalid
+        if (gameVersionIdStr == null || trackIdStr == null)
+        {
+            String errorJson = "{'error': 'Missing required query parameters: gameId and trackId'}";
+            httpExchange.sendResponseHeaders(400, errorJson.getBytes().length);
+            OutputStream os = httpExchange.getResponseBody();
+            os.write(errorJson.getBytes());
+            os.close();
+            return;
+        }
+        var gameId = Integer.parseInt(gameVersionIdStr);
+        var trackId = Integer.parseInt(trackIdStr);
+        getDefaultSetups(httpExchange, gameId, trackId);
     }
 
-    private void getDefaultSetups(HttpExchange httpExchange) throws IOException
+    private void getDefaultSetups(HttpExchange httpExchange, int gameVersionId, int trackId) throws IOException
     {
         try
         {
             // call to the service
-            List<Setup> defaultSetups = setupService.getDefaultSetup();
+            Setup defaultSetup = setupService.getDefaultSetup(gameVersionId, trackId);
             // convert the list to json
-            String json = gson.toJson(defaultSetups);
+            String json = gson.toJson(defaultSetup);
             // send the exchange
             httpExchange.getResponseHeaders().set("Content-Type", "application/json");
             httpExchange.sendResponseHeaders(200, json.getBytes().length);
@@ -78,5 +97,33 @@ public class SetupController implements HttpHandler
             os.write(errorJson.getBytes());
             os.close();
         }
+    }
+    /**
+     * Helper method to turn the query URI into a string map
+     * @param query the raw query string from the URI, e.g. "gameId=1&trackId=2"
+     * @return a Map of the query parameters, e.g. {"gameId": "1", "trackId": "2"}
+     */
+    private Map<String, String> parseQueryParams(String query)
+    {
+        Map<String, String> result = new HashMap<>();
+        // Check if the passed query is valid
+        if (query == null)
+        {
+            System.err.println("[SetupController] No query parameters provided");
+            return result;
+        }
+        // Split the query in two by the & character, then split each part by the = character to
+        // get the key and value, and store them in the result map
+        for (String param : query.split("&"))
+        {
+            String[] entry = param.split("=");
+            // Check if the entry is valid, it should have exactly 2 parts, otherwise we ignore it
+            if (entry.length > 1)
+            {
+                // Store it on the map
+                result.put(entry[0], entry[1]);
+            }
+        }
+        return result;
     }
 }

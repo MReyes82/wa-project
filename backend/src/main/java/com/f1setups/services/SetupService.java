@@ -14,8 +14,8 @@ public class SetupService
         this.setupDao = setupDao;
     }
 
-    public List<Setup> getDefaultSetup()
+    public Setup getDefaultSetup(int game, int track) throws Exception
     {
-        return setupDao.getAll();
+        return setupDao.getDefaultSetup(game, track);
     }
 }

@@ -16,6 +16,7 @@ public class SetupDao implements Dao<Setup>
 {
     // whitelist of available fields to be used within the table definition of the schema
     private static final List<String> allowedFields = List.of(
+            "user_id",
             "team_id",
             "title",
             "annotation",
@@ -328,6 +329,37 @@ public class SetupDao implements Dao<Setup>
         catch (SQLException e)
         {
             System.err.println("[SetupDao] Error in delete: " + e.getMessage());
+        }
+    }
+    /**
+        * Retrieves the default setup for a given game version and track ID.
+        * @param gameVersionId id of game select at the client
+        * @param trackId id of the track selected at the client
+        * @return Setup object representing the default setup for the specified game version and track, or null if no default setup is found or if an error occurs during retrieval.
+     */
+    public Setup getDefaultSetup(int gameVersionId, int trackId)
+    {
+        // user_id = 1 acts as the "default setup" flag.
+        String query = "SELECT * FROM setup WHERE user_id = 1 AND game_version_id = ? AND track_id = ?";
+
+        try (Connection con = DatabaseUtil.getConnection();
+            PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, gameVersionId);
+            ps.setInt(2, trackId);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next())
+            {
+                System.err.println("[SetupDao] No default setup found for game version: " + gameVersionId + " and track id: " + trackId);
+                return null;
+            }
+            return mapRowToSetup(rs);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in getDefaultSetup: " + e.getMessage());
+            return null;
         }
     }
 
