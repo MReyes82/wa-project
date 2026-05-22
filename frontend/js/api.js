@@ -46,6 +46,20 @@ async function requestJson(url, options, fallbackMessage)
     }
 }
 
+function getAuthHeaders()
+{
+    const token = localStorage.getItem('f1_auth_token');
+
+    if (!token)
+    {
+        throw new Error('You must be logged in to manage your setups.');
+    }
+
+    return {
+        'Authorization': `Bearer ${token}`
+    };
+}
+
 async function loginUser(email, password)
 {
     // Prepare the payload for the LoginRequest.java at backend
@@ -105,8 +119,8 @@ async function getDefaultSetup(gameId, trackId)
         throw new Error('Select a game and track before loading a setup.');
     }
 
-    // Matches SetupController behind Main.java's /api/setups context.
-    const url = new URL(`${API_BASE_URL}/setups`);
+    // Public route for one default setup.
+    const url = new URL(`${API_BASE_URL}/setups/default`);
     url.searchParams.set('gameId', gameId);
     url.searchParams.set('trackId', trackId);
 
@@ -124,4 +138,97 @@ async function getDefaultSetup(gameId, trackId)
     }
 
     return setup;
+}
+
+async function getCommunitySetups(gameId, trackId)
+{
+    if (!gameId || !trackId)
+    {
+        throw new Error('Select a game and track before loading community setups.');
+    }
+
+    // Public route for all non-default setups on the selected game and track.
+    const url = new URL(`${API_BASE_URL}/setups/community`);
+    url.searchParams.set('gameId', gameId);
+    url.searchParams.set('trackId', trackId);
+
+    return await requestJson(url.toString(),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    }, 'Failed to retrieve community setups');
+}
+
+async function getMySetups(gameId, trackId)
+{
+    if (!gameId || !trackId)
+    {
+        throw new Error('Select a game and track before loading your setups.');
+    }
+
+    const url = new URL(`${API_BASE_URL}/setups/me`);
+    url.searchParams.set('gameId', gameId);
+    url.searchParams.set('trackId', trackId);
+
+    return await requestJson(url.toString(),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            ...getAuthHeaders()
+        }
+    }, 'Failed to retrieve your setups');
+}
+
+async function getMySetup(setupId)
+{
+    return await requestJson(`${API_BASE_URL}/setups/me/${setupId}`,
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            ...getAuthHeaders()
+        }
+    }, 'Failed to retrieve your setup');
+}
+
+async function createMySetup(setup)
+{
+    return await requestJson(`${API_BASE_URL}/setups/me`,
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...getAuthHeaders()
+        },
+        body: JSON.stringify(setup)
+    }, 'Failed to create setup');
+}
+
+async function updateMySetup(setupId, setup)
+{
+    return await requestJson(`${API_BASE_URL}/setups/me/${setupId}`,
+    {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...getAuthHeaders()
+        },
+        body: JSON.stringify(setup)
+    }, 'Failed to update setup');
+}
+
+async function deleteMySetup(setupId)
+{
+    return await requestJson(`${API_BASE_URL}/setups/me/${setupId}`,
+    {
+        method: 'DELETE',
+        headers: {
+            ...getAuthHeaders()
+        }
+    }, 'Failed to delete setup');
 }

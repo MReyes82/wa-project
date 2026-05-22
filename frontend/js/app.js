@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Auth guard ---
     function checkAuthState() {
-        const token = localStorage.getItem('f1_user_id');
+        const token = localStorage.getItem('f1_auth_token');
         if (token) {
             navigateTo('dashboard');
         } else {
@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function routeUser() {
         const gameId = localStorage.getItem('f1_game_id');
         const trackId = localStorage.getItem('f1_track_id');
-        const userId = localStorage.getItem('f1_user_id');
 
         // If they have everything selected, show the setups
         if (gameId && trackId) {
@@ -167,7 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 authMessage.textContent = "Login successful!";
                 authMessage.style.color = 'green';
 
+                if (!result.token) {
+                    throw new Error('Login response did not include an auth token.');
+                }
+
                 localStorage.setItem('f1_user_id', result.userId);
+                localStorage.setItem('f1_auth_token', result.token);
                 checkAuthState();
             } catch (error) {
                 authMessage.textContent = error.message;
@@ -403,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Grab the elements only after dashboard.html is injected
         document.getElementById('logout-button').addEventListener('click', () => {
             localStorage.removeItem('f1_user_id');
+            localStorage.removeItem('f1_auth_token');
             checkAuthState();
         });
 
