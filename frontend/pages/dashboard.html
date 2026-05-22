@@ -1,8 +1,41 @@
 <div class="dashboard-layout">
     <aside class="sidebar">
-        <button id="logout-button" class="btn-secondary">Logout</button>
+        <div class="sidebar-header">
+            <h2>F1 Setups</h2>
+        </div>
+        <div class="sidebar-nav">
+            <button id="btn-change-track" class="btn-secondary">Change Track</button>
+            <button id="btn-change-game" class="btn-secondary">Change Game</button>
+        </div>
+        <div class="sidebar-footer">
+            <button id="logout-button" class="btn-secondary">Logout</button>
+        </div>
     </aside>
     <main class="main-content">
-        <h1>Select Setup Data</h1>
+        <div class="dashboard-header">
+            <div>
+                <h1>Default Setup</h1>
+                <p id="setup-context" class="setup-context"></p>
+            </div>
+        </div>
+
+        <section id="setup-status" class="setup-status">Loading default setup...</section>
+
+        <section id="setup-view" class="setup-view" hidden>
+            <div class="setup-title-row">
+                <div>
+                    <h2 id="setup-title"></h2>
+                    <p id="setup-annotation"></p>
+                </div>
+            </div>
+
+            <div id="setup-meta" class="setup-meta"></div>
+            <div id="setup-groups" class="setup-groups"></div>
+
+            <details class="raw-json-panel">
+                <summary>Raw JSON</summary>
+                <pre id="setup-json"></pre>
+            </details>
+        </section>
     </main>
 </div>
