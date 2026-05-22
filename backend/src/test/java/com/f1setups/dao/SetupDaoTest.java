@@ -261,6 +261,141 @@ class SetupDaoTest
     }
 
     @Test
+    void getCommunitySetupsExcludesDefaultUserAndFiltersSelection() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("SELECT * FROM setup WHERE user_id <> ? AND game_version_id = ? AND track_id = ?"))
+                .thenReturn(ps);
+        when(ps.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(true, false);
+        when(rs.getInt("id")).thenReturn(15);
+        when(rs.getString("session_type")).thenReturn("RACE");
+        when(rs.getString("controller_type")).thenReturn("WHEEL");
+        when(rs.getTimestamp("created_at")).thenReturn(Timestamp.valueOf(LocalDateTime.of(2026, 4, 1, 0, 0)));
+
+        var setups = setupDao.getCommunitySetups(4, 19);
+
+        assertEquals(1, setups.size());
+        assertEquals(15, setups.get(0).getId());
+        verify(ps).setInt(1, 1);
+        verify(ps).setInt(2, 4);
+        verify(ps).setInt(3, 19);
+    }
+
+    @Test
+    void getSetupsByUserAndSelectionFiltersByOwnerAndSelection() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ?"))
+                .thenReturn(ps);
+        when(ps.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(true, false);
+        when(rs.getInt("id")).thenReturn(22);
+        when(rs.getString("session_type")).thenReturn("QUALIFYING");
+        when(rs.getString("controller_type")).thenReturn("GAMEPAD");
+        when(rs.getTimestamp("created_at")).thenReturn(Timestamp.valueOf(LocalDateTime.of(2026, 4, 2, 0, 0)));
+
+        var setups = setupDao.getSetupsByUserAndSelection(9, 4, 19);
+
+        assertEquals(1, setups.size());
+        assertEquals(22, setups.get(0).getId());
+        verify(ps).setInt(1, 9);
+        verify(ps).setInt(2, 4);
+        verify(ps).setInt(3, 19);
+    }
+
+    @Test
+    void getByIdAndUserIdReturnsOnlyOwnedSetup() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("SELECT * FROM setup WHERE id = ? AND user_id = ?")).thenReturn(ps);
+        when(ps.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(true);
+        when(rs.getInt("id")).thenReturn(31);
+        when(rs.getString("session_type")).thenReturn("TIME_TRIAL");
+        when(rs.getString("controller_type")).thenReturn("WHEEL");
+        when(rs.getTimestamp("created_at")).thenReturn(Timestamp.valueOf(LocalDateTime.of(2026, 4, 3, 0, 0)));
+
+        Optional<Setup> result = setupDao.getByIdAndUserId(31, 9);
+
+        assertTrue(result.isPresent());
+        assertEquals(31, result.get().getId());
+        verify(ps).setInt(1, 31);
+        verify(ps).setInt(2, 9);
+    }
+
+    @Test
+    void getByIdAndUserIdReturnsEmptyWhenSetupIsNotOwned() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("SELECT * FROM setup WHERE id = ? AND user_id = ?")).thenReturn(ps);
+        when(ps.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(false);
+
+        Optional<Setup> result = setupDao.getByIdAndUserId(31, 9);
+
+        assertTrue(result.isEmpty());
+        verify(ps).setInt(1, 31);
+        verify(ps).setInt(2, 9);
+    }
+
+    @Test
+    void deleteByIdAndUserIdDeletesOnlyOwnedSetup() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("DELETE FROM setup WHERE id = ? AND user_id = ?")).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(1);
+
+        boolean deleted = setupDao.deleteByIdAndUserId(44, 9);
+
+        assertTrue(deleted);
+        verify(ps).setInt(1, 44);
+        verify(ps).setInt(2, 9);
+    }
+
+    @Test
+    void deleteByIdAndUserIdReturnsFalseWhenSetupIsNotOwned() throws Exception
+    {
+        Connection con = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        DatabaseUtil.setConnectionProvider(() -> con);
+
+        when(con.prepareStatement("DELETE FROM setup WHERE id = ? AND user_id = ?")).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(0);
+
+        boolean deleted = setupDao.deleteByIdAndUserId(44, 9);
+
+        assertFalse(deleted);
+        verify(ps).setInt(1, 44);
+        verify(ps).setInt(2, 9);
+    }
+
+    @Test
     void getReturnsEmptyOnSqlException()
     {
         SQLException sqlException = new SQLException("boom");
