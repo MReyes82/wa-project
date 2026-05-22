@@ -69,8 +69,10 @@ public class AuthController implements HttpHandler
         {
             // call to the service
             User loggedUser = authService.authenticate(loginRequest.email, loginRequest.password);
+            // Generate the token only after credentials have been verified.
+            String authToken = authService.generateAuthToken(loggedUser);
             // If it didn't throw, create the success response object
-            var loginResponse = new LoginResponse(true, "Login successful", loggedUser.getId());
+            var loginResponse = new LoginResponse(true, "Login successful", loggedUser.getId(), authToken);
             // convert the response to JSON string
             String json = gson.toJson(loginResponse);
             // Now we send 200 OK response and the JSON

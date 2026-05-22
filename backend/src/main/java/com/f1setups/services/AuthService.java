@@ -11,10 +11,18 @@ public class AuthService
 {
     // instance of the Dao passed in the constructor
     private UserDAO userDAO;
+    // Token helper used by controllers to identify the authenticated user.
+    private AuthTokenService authTokenService;
 
     public AuthService(UserDAO userDAO)
     {
+        this(userDAO, new AuthTokenService());
+    }
+
+    public AuthService(UserDAO userDAO, AuthTokenService authTokenService)
+    {
         this.userDAO = userDAO;
+        this.authTokenService = authTokenService;
     }
 
     /**
@@ -46,6 +54,18 @@ public class AuthService
         {
             throw new Exception("[AuthService] Invalid credentials");
         }
+    }
+
+    public String generateAuthToken(User user)
+    {
+        // Called after password authentication succeeds.
+        return authTokenService.generateToken(user.getId());
+    }
+
+    public int getAuthenticatedUserId(String authorizationHeader) throws Exception
+    {
+        // Later setup routes will use this id for ownership checks.
+        return authTokenService.getUserIdFromAuthorizationHeader(authorizationHeader);
     }
 
     /**

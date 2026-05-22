@@ -14,6 +14,14 @@ public class SetupService
         this.setupDao = setupDao;
     }
 
+    /**
+     * Returns the default setup registered for a specific game and track,
+     * if it exists, otherwise it throws an exception.
+     * @param game game to be used
+     * @param track track to be used
+     * @return
+     * @throws Exception
+     */
     public Setup getDefaultSetup(int game, int track) throws Exception
     {
         return setupDao.getDefaultSetup(game, track);
