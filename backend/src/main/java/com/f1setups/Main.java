@@ -22,7 +22,7 @@ public class Main
         var authService = new AuthService(userDAO);
         var authController = new AuthController(authService);
         var setupService = new SetupService(setupDAO);
-        var setupController = new SetupController(setupService);
+        var setupController = new SetupController(setupService, authService);
 
         HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
         server.createContext("/api/auth", authController);

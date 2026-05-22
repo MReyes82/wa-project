@@ -14,6 +14,9 @@ import java.util.Optional;
 
 public class SetupDao implements Dao<Setup>
 {
+    // Default setups are stored under this reserved user id.
+    private static final int DEFAULT_SETUP_USER_ID = 1;
+
     // whitelist of available fields to be used within the table definition of the schema
     private static final List<String> allowedFields = List.of(
             "user_id",
@@ -339,14 +342,14 @@ public class SetupDao implements Dao<Setup>
      */
     public Setup getDefaultSetup(int gameVersionId, int trackId)
     {
-        // user_id = 1 acts as the "default setup" flag.
-        String query = "SELECT * FROM setup WHERE user_id = 1 AND game_version_id = ? AND track_id = ?";
+        String query = "SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ?";
 
         try (Connection con = DatabaseUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(query))
         {
-            ps.setInt(1, gameVersionId);
-            ps.setInt(2, trackId);
+            ps.setInt(1, DEFAULT_SETUP_USER_ID);
+            ps.setInt(2, gameVersionId);
+            ps.setInt(3, trackId);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next())
@@ -360,6 +363,144 @@ public class SetupDao implements Dao<Setup>
         {
             System.err.println("[SetupDao] Error in getDefaultSetup: " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Retrieves public community setups for a selected game and track.
+     * The reserved default setup user is excluded from community results.
+     * @param gameVersionId selected game version id
+     * @param trackId selected track id
+     * @return list of matching non-default setups
+     */
+    public List<Setup> getCommunitySetups(int gameVersionId, int trackId)
+    {
+        String query = "SELECT * FROM setup WHERE user_id <> ? AND game_version_id = ? AND track_id = ?";
+        List<Setup> setups = new ArrayList<>();
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, DEFAULT_SETUP_USER_ID);
+            ps.setInt(2, gameVersionId);
+            ps.setInt(3, trackId);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    setups.add(mapRowToSetup(rs));
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in getCommunitySetups: " + e.getMessage());
+        }
+
+        return setups;
+    }
+
+    /**
+     * Retrieves setups owned by one user for a selected game and track.
+     * @param userId authenticated user id
+     * @param gameVersionId selected game version id
+     * @param trackId selected track id
+     * @return list of matching user-owned setups
+     */
+    public List<Setup> getSetupsByUserAndSelection(int userId, int gameVersionId, int trackId)
+    {
+        String query = "SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ?";
+        List<Setup> setups = new ArrayList<>();
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, userId);
+            ps.setInt(2, gameVersionId);
+            ps.setInt(3, trackId);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    setups.add(mapRowToSetup(rs));
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in getSetupsByUserAndSelection: " + e.getMessage());
+        }
+
+        return setups;
+    }
+
+    /**
+     * Retrieves one setup only when it belongs to the expected user.
+     * This is the DAO-level guard used before authenticated reads and updates.
+     * @param setupId setup id to retrieve
+     * @param userId authenticated user id
+     * @return matching setup, or empty if it does not exist or is not owned by the user
+     */
+    public Optional<Setup> getByIdAndUserId(int setupId, int userId)
+    {
+        String query = "SELECT * FROM setup WHERE id = ? AND user_id = ?";
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, setupId);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (!rs.next())
+                {
+                    System.err.println("[SetupDao] No user-owned setup found with id: " + setupId + " and user id: " + userId);
+                    return Optional.empty();
+                }
+
+                return Optional.of(mapRowToSetup(rs));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in getByIdAndUserId: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Deletes one setup only when it belongs to the expected user.
+     * @param setupId setup id to delete
+     * @param userId authenticated user id
+     * @return true when a row was deleted
+     */
+    public boolean deleteByIdAndUserId(int setupId, int userId)
+    {
+        String query = "DELETE FROM setup WHERE id = ? AND user_id = ?";
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, setupId);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected < 1)
+            {
+                System.err.println("[SetupDao] Delete failed: no user-owned setup found with id " + setupId + " and user id " + userId);
+                return false;
+            }
+
+            System.out.println("[SetupDao] Delete successful. Rows affected: " + rowsAffected);
+            return true;
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in deleteByIdAndUserId: " + e.getMessage());
+            return false;
         }
     }
 
