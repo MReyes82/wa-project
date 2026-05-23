@@ -52,7 +52,7 @@ function getAuthHeaders()
 
     if (!token)
     {
-        throw new Error('You must be logged in to manage your setups.');
+        throw new Error('Debes iniciar sesion para administrar tus setups.');
     }
 
     return {
@@ -79,7 +79,7 @@ async function loginUser(email, password)
                 'Content-Type': 'application/json' // Set the content type to JSON so the server expects JSON data
             },
             body: JSON.stringify(payload) // Convert the payload object to a JSON string
-        }, 'Login failed'); // Return the LoginResponse object from the server
+        }, 'No se pudo iniciar sesion'); // Return the LoginResponse object from the server
     }
     catch (error)
     {
@@ -103,7 +103,7 @@ async function registerUser(username, email, password)
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
-        }, 'Registration failed');
+        }, 'No se pudo crear la cuenta');
     }
     catch (error)
     {
@@ -116,7 +116,7 @@ async function getDefaultSetup(gameId, trackId)
     // The setup endpoint requires both selected ids as query parameters.
     if (!gameId || !trackId)
     {
-        throw new Error('Select a game and track before loading a setup.');
+        throw new Error('Selecciona un juego y una pista antes de cargar un setup.');
     }
 
     // Public route for one default setup.
@@ -130,11 +130,11 @@ async function getDefaultSetup(gameId, trackId)
         headers: {
             'Accept': 'application/json'
         }
-    }, 'Failed to retrieve default setup');
+    }, 'No se pudo cargar el setup base');
 
     if (!setup)
     {
-        throw new Error('No default setup found for this game and track.');
+        throw new Error('No se encontro setup base para este juego y pista.');
     }
 
     return setup;
@@ -144,7 +144,7 @@ async function getCommunitySetups(gameId, trackId)
 {
     if (!gameId || !trackId)
     {
-        throw new Error('Select a game and track before loading community setups.');
+        throw new Error('Selecciona un juego y una pista antes de cargar setups de la comunidad.');
     }
 
     // Public route for all non-default setups on the selected game and track.
@@ -158,14 +158,14 @@ async function getCommunitySetups(gameId, trackId)
         headers: {
             'Accept': 'application/json'
         }
-    }, 'Failed to retrieve community setups');
+    }, 'No se pudieron cargar los setups de la comunidad');
 }
 
 async function getMySetups(gameId, trackId)
 {
     if (!gameId || !trackId)
     {
-        throw new Error('Select a game and track before loading your setups.');
+        throw new Error('Selecciona un juego y una pista antes de cargar tus setups.');
     }
 
     const url = new URL(`${API_BASE_URL}/setups/me`);
@@ -179,7 +179,7 @@ async function getMySetups(gameId, trackId)
             'Accept': 'application/json',
             ...getAuthHeaders()
         }
-    }, 'Failed to retrieve your setups');
+    }, 'No se pudieron cargar tus setups');
 }
 
 async function getMySetup(setupId)
@@ -191,7 +191,7 @@ async function getMySetup(setupId)
             'Accept': 'application/json',
             ...getAuthHeaders()
         }
-    }, 'Failed to retrieve your setup');
+    }, 'No se pudo cargar tu setup');
 }
 
 async function createMySetup(setup)
@@ -205,7 +205,7 @@ async function createMySetup(setup)
             ...getAuthHeaders()
         },
         body: JSON.stringify(setup)
-    }, 'Failed to create setup');
+    }, 'No se pudo crear el setup');
 }
 
 async function updateMySetup(setupId, setup)
@@ -219,7 +219,7 @@ async function updateMySetup(setupId, setup)
             ...getAuthHeaders()
         },
         body: JSON.stringify(setup)
-    }, 'Failed to update setup');
+    }, 'No se pudo actualizar el setup');
 }
 
 async function deleteMySetup(setupId)
@@ -230,5 +230,5 @@ async function deleteMySetup(setupId)
         headers: {
             ...getAuthHeaders()
         }
-    }, 'Failed to delete setup');
+    }, 'No se pudo eliminar el setup');
 }

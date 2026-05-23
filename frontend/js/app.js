@@ -117,21 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('show-login').addEventListener('click', () => {
             registerForm.style.display = 'none';
             loginForm.style.display = 'block';
-            authTitle.textContent = 'Welcome to F1 Setups';
+            authTitle.textContent = 'Iniciar sesion';
             authMessage.textContent = '';
         });
 
         document.getElementById('show-register').addEventListener('click', () => {
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
-            authTitle.textContent = 'Join';
+            authTitle.textContent = 'Crear cuenta';
             authMessage.textContent = '';
         });
 
         // Registration Logic
         registerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            authMessage.textContent = 'Warming up the tires...';
+            authMessage.textContent = 'Preparando cuenta...';
             authMessage.style.color = 'var(--text-muted)';
 
             const username = document.getElementById('reg-username-input').value;
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const result = await registerUser(username, email, password);
-                authMessage.textContent = "Account created! You can now login.";
+                authMessage.textContent = "Cuenta creada. Ya puedes iniciar sesion.";
                 authMessage.style.color = '#4caf50';
 
                 setTimeout(() => {
@@ -155,19 +155,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Login Logic
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            authMessage.textContent = 'Logging in...';
-            authMessage.style.color = 'black';
+            authMessage.textContent = 'Iniciando sesion...';
+            authMessage.style.color = 'var(--text-muted)';
 
             const email = document.getElementById('email-input').value;
             const password = document.getElementById('password-input').value;
 
             try {
                 const result = await loginUser(email, password);
-                authMessage.textContent = "Login successful!";
-                authMessage.style.color = 'green';
+                authMessage.textContent = "Sesion iniciada.";
+                authMessage.style.color = 'var(--color-success)';
 
                 if (!result.token) {
-                    throw new Error('Login response did not include an auth token.');
+                    throw new Error('La respuesta de inicio de sesion no incluyo token de autenticacion.');
                 }
 
                 localStorage.setItem('f1_user_id', result.userId);
@@ -383,20 +383,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setSetupContext(gameId, trackId);
 
         if (!gameId || !trackId) {
-            showSetupStatus('Select a game and track to load a default setup.', 'Select Setup', () => {
+            showSetupStatus('Selecciona un juego y una pista para cargar un setup base.', 'Seleccionar setup', () => {
                 navigateTo('game-select');
             });
             return;
         }
 
         // Show immediate feedback while the backend request is in flight.
-        showSetupStatus('Loading default setup...');
+        showSetupStatus('Cargando setup base...');
 
         try {
             const setup = await getDefaultSetup(gameId, trackId);
             renderDefaultSetup(setup, gameId, trackId);
         } catch (error) {
-            showSetupStatus(error.message, 'Change Track', () => {
+            showSetupStatus(error.message, 'Cambiar pista', () => {
                 localStorage.removeItem('f1_track_id');
                 routeUser();
             });

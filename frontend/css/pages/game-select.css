@@ -1,0 +1,34 @@
+.selection-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.selection-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.selection-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 230px;
+    padding: 22px;
+}
+
+.selection-card .chip {
+    align-self: flex-start;
+    margin-bottom: 18px;
+}
+
+.selection-card h3 {
+    margin-bottom: 10px;
+}
+
+.selection-card p {
+    flex: 1;
+    margin-bottom: 24px;
+}
+
+.selection-card .btn-primary {
+    width: 100%;
+}

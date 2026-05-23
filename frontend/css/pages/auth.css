@@ -1,83 +1,45 @@
-/* Auth page */
-.auth-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
+.auth-page {
+    display: grid;
+    place-items: center;
 }
 
 .auth-card {
-    background-color: var(--card-bg);
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    width: min(100%, 420px);
+}
+
+.auth-card .badge {
+    margin-bottom: 18px;
 }
 
 .auth-card h2 {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 30px;
-    font-weight: 600;
+    margin-bottom: 24px;
 }
 
-.input-group {
-    margin-bottom: 20px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.input-group input {
+.auth-form {
     width: 100%;
-    padding: 12px;
-    background-color: #2a2a2a;
-    border: 1px solid #333;
-    border-radius: 4px;
-    color: white;
-    box-sizing: border-box; /* Ensures padding doesn't widen the box */
 }
 
-.input-group input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
-.btn-primary {
+.auth-form .btn-primary {
     width: 100%;
-    padding: 12px;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-hover);
+    margin-top: 4px;
 }
 
 .toggle-text {
+    margin: 18px 0 0;
     text-align: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
+    font-size: 0.92rem;
 }
 
 .toggle-text span {
     color: var(--accent-color);
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 800;
 }
 
-.message {
+.toggle-text span:hover {
+    color: var(--accent-hover);
+}
+
+.auth-card .message {
     text-align: center;
-    margin-top: 15px;
-    font-weight: bold;
-    min-height: 20px; /* Prevents layout jump when text appears */
 }

@@ -1,16 +1,25 @@
-<div class="selection-container" style="padding: 40px;">
-    <h2>Select a Circuit</h2>
-    <button id="btn-back-game" class="btn-secondary" style="margin-bottom: 20px;">&larr; Change Game</button>
-    <div class="card-grid">
-        <div class="game-card">
-            <h3>Bahrain</h3>
-            <!-- Assuming Bahrain is ID 1 in your DB -->
-            <button class="btn-primary track-select-btn" data-id="1">Select Track</button>
+<main class="selection-page page-shell">
+    <header class="section-header">
+        <div>
+            <span class="badge">Circuito</span>
+            <h1>Selecciona una pista</h1>
+            <p>Filtra los registros por circuito antes de ver los setups disponibles.</p>
         </div>
-        <div class="game-card">
-            <h3>Monza</h3>
-            <!-- Assuming Monza is ID 2 in your DB -->
-            <button class="btn-primary track-select-btn" data-id="19">Select Track</button>
-        </div>
-    </div>
-</div>
+        <button id="btn-back-game" class="btn-secondary">Cambiar juego</button>
+    </header>
+
+    <section class="card-grid selection-grid">
+        <article class="game-card selection-card track-card">
+            <span class="chip">Bahrein</span>
+            <h3>Bahrain GP</h3>
+            <p>Traccion, frenada estable y buen balance en curvas lentas.</p>
+            <button class="btn-primary track-select-btn" data-id="1">Seleccionar pista</button>
+        </article>
+        <article class="game-card selection-card track-card">
+            <span class="chip">Italia</span>
+            <h3>Italian GP</h3>
+            <p>Baja carga aerodinamica y velocidad punta para Monza.</p>
+            <button class="btn-primary track-select-btn" data-id="19">Seleccionar pista</button>
+        </article>
+    </section>
+</main>

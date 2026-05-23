@@ -1,37 +1,38 @@
-<div class="auth-container" id="auth-section">
-    <div class="auth-card">
-        <h2 id="auth-title">Welcome to F1Setups Hub</h2>
+<main class="auth-page page-shell" id="auth-section">
+    <section class="auth-card surface-card">
+        <span class="badge">Cuenta</span>
+        <h2 id="auth-title">Iniciar sesion</h2>
 
         <form id="login-form" class="auth-form">
             <div class="input-group">
-                <label for="email-input">Email</label>
-                <input type="email" id="email-input" required>
+                <label for="email-input">Correo electronico</label>
+                <input type="email" id="email-input" autocomplete="email" required>
             </div>
             <div class="input-group">
-                <label for="password-input">Password</label>
-                <input type="password" id="password-input" required>
+                <label for="password-input">Contrasena</label>
+                <input type="password" id="password-input" autocomplete="current-password" required>
             </div>
-            <button type="submit" class="btn-primary">Login</button>
-            <p class="toggle-text">Need an account? <span id="show-register">Sign Up</span></p>
+            <button type="submit" class="btn-primary">Entrar</button>
+            <p class="toggle-text">No tienes cuenta? <span id="show-register">Crear cuenta</span></p>
         </form>
 
         <form id="register-form" class="auth-form" style="display: none;">
             <div class="input-group">
-                <label for="reg-username-input">Username</label>
-                <input type="text" id="reg-username-input" required>
+                <label for="reg-username-input">Nombre de usuario</label>
+                <input type="text" id="reg-username-input" autocomplete="username" required>
             </div>
             <div class="input-group">
-                <label for="reg-email-input">Email</label>
-                <input type="email" id="reg-email-input" required>
+                <label for="reg-email-input">Correo electronico</label>
+                <input type="email" id="reg-email-input" autocomplete="email" required>
             </div>
             <div class="input-group">
-                <label for="reg-password-input">Password</label>
-                <input type="password" id="reg-password-input" required minlength="6">
+                <label for="reg-password-input">Contrasena</label>
+                <input type="password" id="reg-password-input" autocomplete="new-password" required minlength="6">
             </div>
-            <button type="submit" class="btn-primary">Create Account</button>
-            <p class="toggle-text">Already have an account? <span id="show-login">Login</span></p>
+            <button type="submit" class="btn-primary">Crear cuenta</button>
+            <p class="toggle-text">Ya tienes cuenta? <span id="show-login">Iniciar sesion</span></p>
         </form>
 
         <div id="auth-message" class="message"></div>
-    </div>
-</div>
+    </section>
+</main>
