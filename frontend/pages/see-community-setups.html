@@ -1,0 +1,66 @@
+<main class="setups-page page-shell">
+    <header class="section-header">
+        <div>
+            <span class="badge">Comunidad</span>
+            <h1>Registros publicos</h1>
+            <p id="community-context">Setups compartidos para la seleccion actual.</p>
+        </div>
+        <button id="btn-community-back-dashboard" class="btn-secondary">Volver</button>
+    </header>
+
+    <section class="filters-panel surface-card">
+        <div class="input-group">
+            <label for="community-weather-filter">Clima</label>
+            <select id="community-weather-filter">
+                <option value="">Todos</option>
+                <option value="dry">Seco</option>
+                <option value="wet">Mojado</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="community-session-filter">Tipo de sesion</label>
+            <select id="community-session-filter">
+                <option value="">Todas</option>
+                <option value="PRACTICE">Practica</option>
+                <option value="QUALIFYING">Clasificación</option>
+                <option value="RACE">Carrera</option>
+                <option value="TIME_TRIAL">Contrarreloj</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="community-controller-filter">Tipo de control</label>
+            <select id="community-controller-filter">
+                <option value="">Todos</option>
+                <option value="GAMEPAD">Mando</option>
+                <option value="WHEEL">Volante</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="community-team-filter">Equipo</label>
+            <select id="community-team-filter">
+                <option value="">Todos</option>
+                <option value="1">Mercedes</option>
+                <option value="2">Red Bull Racing</option>
+                <option value="3">Ferrari</option>
+                <option value="4">McLaren</option>
+                <option value="5">Alpine</option>
+                <option value="6">AlphaTauri</option>
+                <option value="7">Aston Martin</option>
+                <option value="8">Williams</option>
+                <option value="9">Alfa Romeo</option>
+                <option value="10">Haas</option>
+                <option value="11">Sauber</option>
+                <option value="12">VCARB</option>
+                <option value="13">ApxGp</option>
+                <option value="14">Konnersport</option>
+                <option value="15">Cadillac</option>
+                <option value="16">My team</option>
+            </select>
+        </div>
+    </section>
+
+    <section class="setups-list-panel">
+        <div id="community-setups-status" class="empty-state">Cargando registros publicos...</div>
+        <div id="community-setups-list" class="setup-list"></div>
+    </section>
+</main>

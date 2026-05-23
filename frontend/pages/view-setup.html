@@ -1,0 +1,192 @@
+<main class="view-setup-page page-shell">
+    <header class="section-header">
+        <div>
+            <span id="view-setup-mode-label" class="badge">Lectura</span>
+            <h1 id="view-setup-page-title">Setup</h1>
+            <p id="view-setup-context">Detalle del registro seleccionado.</p>
+        </div>
+        <div class="header-actions">
+            <button id="btn-view-back" class="btn-secondary">Volver</button>
+            <button id="btn-view-edit" class="btn-secondary">Editar</button>
+            <button id="btn-view-delete" class="btn-ghost">Eliminar</button>
+        </div>
+    </header>
+
+    <section id="view-setup-status" class="empty-state" hidden></section>
+
+    <section id="setup-read-mode" class="setup-read-panel surface-card">
+        <div class="read-title">
+            <h2 id="read-setup-title">Setup sin seleccionar</h2>
+            <p id="read-setup-annotation"></p>
+        </div>
+        <div id="read-setup-meta" class="read-meta-grid"></div>
+        <div id="read-setup-groups" class="read-groups-grid"></div>
+    </section>
+
+    <form id="setup-form" class="setup-form surface-card" hidden>
+        <section class="form-section">
+            <h2>Informacion general</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="setup-title-input">Titulo</label>
+                    <input id="setup-title-input" name="title" type="text" maxlength="64" required>
+                </div>
+                <div class="input-group">
+                    <label for="setup-team-input">Equipo</label>
+                    <select id="setup-team-input" name="teamId" required>
+                        <option value="1">Mercedes</option>
+                        <option value="2">Red Bull Racing</option>
+                        <option value="3">Ferrari</option>
+                        <option value="4">McLaren</option>
+                        <option value="5">Alpine</option>
+                        <option value="6">AlphaTauri</option>
+                        <option value="7">Aston Martin</option>
+                        <option value="8">Williams</option>
+                        <option value="9">Alfa Romeo</option>
+                        <option value="10">Haas</option>
+                        <option value="11">Sauber</option>
+                        <option value="12">VCARB</option>
+                        <option value="13">ApxGp</option>
+                        <option value="14">Konnersport</option>
+                        <option value="15">Cadillac</option>
+                        <option value="16">My team</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="setup-session-input">Tipo de sesion</label>
+                    <select id="setup-session-input" name="sessionType" required>
+                        <option value="PRACTICE">Practica</option>
+                        <option value="QUALIFYING">Clasificacion</option>
+                        <option value="RACE">Carrera</option>
+                        <option value="TIME_TRIAL">Contrarreloj</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="setup-controller-input">Tipo de control</label>
+                    <select id="setup-controller-input" name="controllerType" required>
+                        <option value="GAMEPAD">Mando</option>
+                        <option value="WHEEL">Volante</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="setup-weather-input">Clima</label>
+                    <select id="setup-weather-input" name="isWetWeather" required>
+                        <option value="false">Seco</option>
+                        <option value="true">Mojado</option>
+                    </select>
+                </div>
+                <div class="input-group full-width">
+                    <label for="setup-annotation-input">Notas</label>
+                    <textarea id="setup-annotation-input" name="annotation"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Aerodinamica y transmision</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="front-wing-input">Ala delantera</label>
+                    <input id="front-wing-input" name="frontWing" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-wing-input">Ala trasera</label>
+                    <input id="rear-wing-input" name="rearWing" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="diff-on-input">Diferencial en aceleracion</label>
+                    <input id="diff-on-input" name="diffOnThrottle" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="diff-off-input">Diferencial en retencion</label>
+                    <input id="diff-off-input" name="diffOffThrottle" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="engine-braking-input">Freno motor</label>
+                    <input id="engine-braking-input" name="engineBraking" type="number" min="0" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Suspension</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="front-camber-input">Caida delantera</label>
+                    <input id="front-camber-input" name="frontCamber" type="number" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-camber-input">Caida trasera</label>
+                    <input id="rear-camber-input" name="rearCamber" type="number" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-toe-input">Convergencia delantera</label>
+                    <input id="front-toe-input" name="frontToe" type="number" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-toe-input">Convergencia trasera</label>
+                    <input id="rear-toe-input" name="rearToe" type="number" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-suspension-input">Suspension delantera</label>
+                    <input id="front-suspension-input" name="frontSuspension" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-suspension-input">Suspension trasera</label>
+                    <input id="rear-suspension-input" name="rearSuspension" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-arb-input">Barra delantera</label>
+                    <input id="front-arb-input" name="frontAntiRollBar" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-arb-input">Barra trasera</label>
+                    <input id="rear-arb-input" name="rearAntiRollBar" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-ride-height-input">Altura delantera</label>
+                    <input id="front-ride-height-input" name="frontRideHeight" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-ride-height-input">Altura trasera</label>
+                    <input id="rear-ride-height-input" name="rearRideHeight" type="number" min="0" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Frenos y neumaticos</h2>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="brake-pressure-input">Presion de freno</label>
+                    <input id="brake-pressure-input" name="brakePressure" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="brake-bias-input">Balance de freno</label>
+                    <input id="brake-bias-input" name="brakeBias" type="number" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-right-pressure-input">Presion delantera derecha</label>
+                    <input id="front-right-pressure-input" name="frontRightPressure" type="number" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="front-left-pressure-input">Presion delantera izquierda</label>
+                    <input id="front-left-pressure-input" name="frontLeftPressure" type="number" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-right-pressure-input">Presion trasera derecha</label>
+                    <input id="rear-right-pressure-input" name="rearRightPressure" type="number" step="0.1" required>
+                </div>
+                <div class="input-group">
+                    <label for="rear-left-pressure-input">Presion trasera izquierda</label>
+                    <input id="rear-left-pressure-input" name="rearLeftPressure" type="number" step="0.1" required>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button id="btn-cancel-setup-form" type="button" class="btn-secondary">Volver</button>
+            <button id="btn-save-setup" type="submit" class="btn-primary">Guardar</button>
+        </div>
+    </form>
+</main>
