@@ -42,10 +42,23 @@
     margin-bottom: 0;
 }
 
+.setup-list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 14px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
 .setup-list-actions {
     display: flex;
     flex-shrink: 0;
     gap: 10px;
+}
+
+.danger-action {
+    color: var(--color-danger);
 }
 
 @media (max-width: 920px) {
