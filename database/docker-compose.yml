@@ -1,8 +1,8 @@
 # Docker compose file for the MYSQL server
 services:
   mysql:
-    image: mysql:5.7
-    container_name: mysql-5.7
+    image: mysql:8.0
+    container_name: mysql-8.0
     restart: always                       # always restart
     environment:
       MYSQL_DATABASE: 'wa-project'              # name of database
