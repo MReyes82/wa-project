@@ -91,6 +91,31 @@
         { id: 'wet', value: 'true', name: 'Mojado' }
     ];
 
+    const countryFlags = {
+        Bahrain: '🇧🇭',
+        China: '🇨🇳',
+        Japan: '🇯🇵',
+        'Saudi Arabia': '🇸🇦',
+        Italy: '🇮🇹',
+        Australia: '🇦🇺',
+        Azerbaijan: '🇦🇿',
+        USA: '🇺🇸',
+        Spain: '🇪🇸',
+        Monaco: '🇲🇨',
+        Canada: '🇨🇦',
+        Austria: '🇦🇹',
+        'United Kingdom': '🇬🇧',
+        France: '🇫🇷',
+        Hungary: '🇭🇺',
+        Belgium: '🇧🇪',
+        Netherlands: '🇳🇱',
+        Mexico: '🇲🇽',
+        Brazil: '🇧🇷',
+        Singapore: '🇸🇬',
+        Qatar: '🇶🇦',
+        'United Arab Emirates': '🇦🇪'
+    };
+
     function findById(items, id) {
         return items.find(item => item.id === String(id));
     }
@@ -119,6 +144,10 @@
         return `${getGameLabel(gameId)} / ${getTrackLabel(trackId)}`;
     }
 
+    function getCountryFlag(country) {
+        return countryFlags[country] || '🏁';
+    }
+
     function getWeatherFlag(setup) {
         return setup?.isWetWeather ?? setup?.wetWeather;
     }
@@ -142,12 +171,14 @@
         sessions,
         controllers,
         weather,
+        countryFlags,
         getGameLabel,
         getTrackLabel,
         getTeamLabel,
         getSessionLabel,
         getControllerLabel,
         getSelectionLabel,
+        getCountryFlag,
         getWeatherFlag,
         getWeatherLabelFromFlag,
         getSetupWeatherLabel

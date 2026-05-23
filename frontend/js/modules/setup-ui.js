@@ -110,15 +110,8 @@
             const card = document.createElement('article');
             card.className = 'game-card selection-card';
 
-            const chip = document.createElement('span');
-            chip.className = 'chip';
-            chip.textContent = String(game.releaseYear);
-
             const title = document.createElement('h3');
             title.textContent = game.name;
-
-            const description = document.createElement('p');
-            description.textContent = game.description;
 
             const button = document.createElement('button');
             button.className = 'btn-primary game-select-btn';
@@ -127,9 +120,7 @@
             button.textContent = 'Seleccionar';
             button.addEventListener('click', () => onSelect(game.id));
 
-            card.appendChild(chip);
             card.appendChild(title);
-            card.appendChild(description);
             card.appendChild(button);
             container.appendChild(card);
         });
@@ -146,26 +137,22 @@
             const card = document.createElement('article');
             card.className = 'game-card selection-card track-card';
 
-            const chip = document.createElement('span');
-            chip.className = 'chip';
-            chip.textContent = track.country;
+            const flag = document.createElement('span');
+            flag.className = 'track-flag';
+            flag.textContent = catalog.getCountryFlag(track.country);
 
             const title = document.createElement('h3');
             title.textContent = track.name;
-
-            const description = document.createElement('p');
-            description.textContent = 'Circuito disponible en el catalogo de setups.';
 
             const button = document.createElement('button');
             button.className = 'btn-primary track-select-btn';
             button.type = 'button';
             button.dataset.id = track.id;
-            button.textContent = 'Seleccionar pista';
+            button.textContent = 'Seleccionar';
             button.addEventListener('click', () => onSelect(track.id));
 
-            card.appendChild(chip);
+            card.appendChild(flag);
             card.appendChild(title);
-            card.appendChild(description);
             card.appendChild(button);
             container.appendChild(card);
         });
@@ -289,7 +276,9 @@
         const setupMeta = document.getElementById('setup-meta');
         const setupGroupsContainer = document.getElementById('setup-groups');
         const setupJson = document.getElementById('setup-json');
+        const rawJsonPanel = document.getElementById('raw-json-panel');
 
+        // Flag to toggle debug mode
         status.hidden = true;
         setupView.hidden = false;
 
@@ -297,7 +286,11 @@
         setupAnnotation.textContent = setup.annotation || '';
         setupMeta.textContent = '';
         setupGroupsContainer.textContent = '';
-        setupJson.textContent = JSON.stringify(setup, null, 2);
+
+        if (rawJsonPanel && setupJson) {
+            rawJsonPanel.hidden = !config.debug.showRawSetupJson;
+            setupJson.textContent = config.debug.showRawSetupJson ? JSON.stringify(setup, null, 2) : '';
+        }
 
         [
             ['Juego', catalog.getGameLabel(gameId)],

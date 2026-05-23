@@ -110,6 +110,16 @@
         }
 
         function initDashboardSetups() {
+            bindClick('btn-sidebar-community-setups', () => {
+                navigateTo('see-community-setups');
+            });
+
+            bindClick('btn-sidebar-my-setups', () => {
+                if (requireAuth()) {
+                    navigateTo('see-my-setups');
+                }
+            });
+
             bindClick('btn-see-community-setups', () => {
                 navigateTo('see-community-setups');
             });

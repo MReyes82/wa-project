@@ -1,11 +1,16 @@
 <div class="dashboard-layout">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <span class="badge">Hub</span>
-            <h2>F1 Setups</h2>
+            <h2 class="sidebar-brand">
+                <span>F1Setups</span>
+                <span>Hub</span>
+            </h2>
         </div>
 
         <nav class="sidebar-nav">
+            <button id="btn-sidebar-dashboard" class="btn-secondary">Mi garaje</button>
+            <button id="btn-sidebar-my-setups" class="btn-secondary">My Setups</button>
+            <button id="btn-sidebar-community-setups" class="btn-secondary">Explore Setups</button>
             <button id="btn-change-track" class="btn-secondary">Cambiar pista</button>
             <button id="btn-change-game" class="btn-secondary">Cambiar juego</button>
         </nav>
@@ -18,8 +23,8 @@
     <main class="main-content">
         <header class="dashboard-header">
             <div>
-                <span class="badge">Panel</span>
-                <h1>Setups del circuito</h1>
+                <span class="badge">Dashboard</span>
+                <h1>Mi garaje</h1>
                 <p id="setup-context" class="setup-context"></p>
             </div>
         </header>
@@ -105,7 +110,7 @@
                 <div id="setup-meta" class="setup-meta"></div>
                 <div id="setup-groups" class="setup-groups"></div>
 
-                <details class="raw-json-panel">
+                <details id="raw-json-panel" class="raw-json-panel" hidden>
                     <summary>JSON original</summary>
                     <pre id="setup-json"></pre>
                 </details>

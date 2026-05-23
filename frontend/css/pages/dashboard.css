@@ -21,13 +21,17 @@
     border-bottom: 1px solid var(--color-border);
 }
 
-.sidebar-header .badge {
-    margin-bottom: 14px;
-}
-
-.sidebar-header h2 {
+.sidebar-brand {
     margin-bottom: 0;
     color: var(--text-main);
+}
+
+.sidebar-brand span {
+    display: block;
+}
+
+.sidebar-brand span:last-child {
+    color: var(--accent-color);
 }
 
 .sidebar-nav {
@@ -253,6 +257,10 @@
     background-color: var(--card-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
+}
+
+.raw-json-panel[hidden] {
+    display: none;
 }
 
 .raw-json-panel summary {

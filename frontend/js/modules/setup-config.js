@@ -114,6 +114,10 @@
         ...decimalSetupFields
     ];
 
+    const debug = {
+        showRawSetupJson: false
+    };
+
     window.F1SetupConfig = {
         storageKeys,
         setupSources,
@@ -121,6 +125,7 @@
         setupGroups,
         integerSetupFields,
         decimalSetupFields,
-        setupFormFields
+        setupFormFields,
+        debug
     };
 })();

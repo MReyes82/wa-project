@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem(storageKeys.gameId);
             localStorage.removeItem(storageKeys.trackId);
             clearSetupViewState();
-            routeUser();
+            navigateTo('game-select');
         });
 
         const container = document.getElementById('track-select-list');
@@ -190,7 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 authMessage.style.color = 'var(--color-success)';
                 localStorage.setItem(storageKeys.userId, result.userId);
                 localStorage.setItem(storageKeys.authToken, result.token);
-                checkAuthState();
+                localStorage.removeItem(storageKeys.gameId);
+                localStorage.removeItem(storageKeys.trackId);
+                clearSetupViewState();
+                navigateTo('game-select');
             } catch (error) {
                 authMessage.textContent = error.message;
                 authMessage.style.color = 'var(--accent-color)';
@@ -217,6 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem(storageKeys.trackId);
             clearSetupViewState();
             navigateTo('game-select');
+        });
+
+        bindClick('btn-sidebar-dashboard', () => {
+            navigateTo('dashboard');
         });
 
         setupPages.initDashboardSetups();
