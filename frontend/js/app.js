@@ -189,61 +189,61 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const trackLabels = {
-        '1': 'Bahrain',
-        '19': 'Monza'
+        '1': 'Bahrain GP',
+        '19': 'Italian GP'
     };
 
     // Maps backend Setup JSON properties into dashboard sections.
     const setupGroups = [
         {
-            title: 'Aero',
+            title: 'Aerodinamica',
             fields: [
-                ['Front Wing', 'frontWing'],
-                ['Rear Wing', 'rearWing']
+                ['Ala delantera', 'frontWing'],
+                ['Ala trasera', 'rearWing']
             ]
         },
         {
-            title: 'Transmission',
+            title: 'Transmision',
             fields: [
-                ['Diff On Throttle', 'diffOnThrottle'],
-                ['Diff Off Throttle', 'diffOffThrottle'],
-                ['Engine Braking', 'engineBraking']
+                ['Diferencial en aceleracion', 'diffOnThrottle'],
+                ['Diferencial en retencion', 'diffOffThrottle'],
+                ['Freno motor', 'engineBraking']
             ]
         },
         {
-            title: 'Suspension Geometry',
+            title: 'Geometria de suspension',
             fields: [
-                ['Front Camber', 'frontCamber'],
-                ['Rear Camber', 'rearCamber'],
-                ['Front Toe', 'frontToe'],
-                ['Rear Toe', 'rearToe']
+                ['Caida delantera', 'frontCamber'],
+                ['Caida trasera', 'rearCamber'],
+                ['Convergencia delantera', 'frontToe'],
+                ['Convergencia trasera', 'rearToe']
             ]
         },
         {
             title: 'Suspension',
             fields: [
-                ['Front Suspension', 'frontSuspension'],
-                ['Rear Suspension', 'rearSuspension'],
-                ['Front Anti-Roll Bar', 'frontAntiRollBar'],
-                ['Rear Anti-Roll Bar', 'rearAntiRollBar'],
-                ['Front Ride Height', 'frontRideHeight'],
-                ['Rear Ride Height', 'rearRideHeight']
+                ['Suspension delantera', 'frontSuspension'],
+                ['Suspension trasera', 'rearSuspension'],
+                ['Barra delantera', 'frontAntiRollBar'],
+                ['Barra trasera', 'rearAntiRollBar'],
+                ['Altura delantera', 'frontRideHeight'],
+                ['Altura trasera', 'rearRideHeight']
             ]
         },
         {
-            title: 'Brakes',
+            title: 'Frenos',
             fields: [
-                ['Brake Pressure', 'brakePressure'],
-                ['Brake Bias', 'brakeBias']
+                ['Presion de freno', 'brakePressure'],
+                ['Balance de freno', 'brakeBias']
             ]
         },
         {
-            title: 'Tyres',
+            title: 'Neumaticos',
             fields: [
-                ['Front Right Pressure', 'frontRightPressure'],
-                ['Front Left Pressure', 'frontLeftPressure'],
-                ['Rear Right Pressure', 'rearRightPressure'],
-                ['Rear Left Pressure', 'rearLeftPressure']
+                ['Presion delantera derecha', 'frontRightPressure'],
+                ['Presion delantera izquierda', 'frontLeftPressure'],
+                ['Presion trasera derecha', 'rearRightPressure'],
+                ['Presion trasera izquierda', 'rearLeftPressure']
             ]
         }
     ];
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (typeof value === 'boolean') {
-            return value ? 'Yes' : 'No';
+            return value ? 'Si' : 'No';
         }
 
         return String(value);
@@ -267,11 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return 'N/A';
         }
 
-        return String(value)
-            .toLowerCase()
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+        const labels = {
+            PRACTICE: 'Practica',
+            QUALIFYING: 'Clasificacion',
+            RACE: 'Carrera',
+            TIME_TRIAL: 'Contrarreloj',
+            GAMEPAD: 'Mando',
+            WHEEL: 'Volante'
+        };
+
+        return labels[value] || String(value);
     }
 
     // Build one reusable label/value row for metadata and setup values.
@@ -316,8 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keep the selected game and track visible above the setup details.
     function setSetupContext(gameId, trackId) {
         const context = document.getElementById('setup-context');
-        const gameName = gameLabels[gameId] || `Game ${gameId || '-'}`;
-        const trackName = trackLabels[trackId] || `Track ${trackId || '-'}`;
+        const gameName = gameLabels[gameId] || `Juego ${gameId || '-'}`;
+        const trackName = trackLabels[trackId] || `Pista ${trackId || '-'}`;
 
         context.textContent = `${gameName} / ${trackName}`;
     }
@@ -336,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupView.hidden = false;
 
         // Clear previous dashboard content before rendering a newly loaded setup.
-        setupTitle.textContent = setup.title || 'Default Setup';
+        setupTitle.textContent = setup.title || 'Setup base';
         setupAnnotation.textContent = setup.annotation || '';
         setupMeta.textContent = '';
         setupGroupsContainer.textContent = '';
@@ -345,14 +350,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const wetWeather = setup.isWetWeather ?? setup.wetWeather;
         const weatherLabel = wetWeather === null || wetWeather === undefined
             ? 'N/A'
-            : (wetWeather ? 'Wet' : 'Dry');
+            : (wetWeather ? 'Mojado' : 'Seco');
         const metadata = [
-            ['Game', gameLabels[gameId] || `Game ${gameId}`],
-            ['Track', trackLabels[trackId] || `Track ${trackId}`],
-            ['Session', formatEnum(setup.sessionType)],
-            ['Controller', formatEnum(setup.controllerType)],
-            ['Weather', weatherLabel],
-            ['Created', setup.createdAt]
+            ['Juego', gameLabels[gameId] || `Juego ${gameId}`],
+            ['Pista', trackLabels[trackId] || `Pista ${trackId}`],
+            ['Sesion', formatEnum(setup.sessionType)],
+            ['Control', formatEnum(setup.controllerType)],
+            ['Clima', weatherLabel],
+            ['Creado', setup.createdAt]
         ];
 
         metadata.forEach(([label, value]) => {

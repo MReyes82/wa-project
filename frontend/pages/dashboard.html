@@ -1,41 +1,115 @@
 <div class="dashboard-layout">
     <aside class="sidebar">
         <div class="sidebar-header">
+            <span class="badge">Hub</span>
             <h2>F1 Setups</h2>
         </div>
-        <div class="sidebar-nav">
-            <button id="btn-change-track" class="btn-secondary">Change Track</button>
-            <button id="btn-change-game" class="btn-secondary">Change Game</button>
-        </div>
+
+        <nav class="sidebar-nav">
+            <button id="btn-change-track" class="btn-secondary">Cambiar pista</button>
+            <button id="btn-change-game" class="btn-secondary">Cambiar juego</button>
+        </nav>
+
         <div class="sidebar-footer">
-            <button id="logout-button" class="btn-secondary">Logout</button>
+            <button id="logout-button" class="btn-ghost">Cerrar sesion</button>
         </div>
     </aside>
+
     <main class="main-content">
-        <div class="dashboard-header">
+        <header class="dashboard-header">
             <div>
-                <h1>Default Setup</h1>
+                <span class="badge">Panel</span>
+                <h1>Setups del circuito</h1>
                 <p id="setup-context" class="setup-context"></p>
             </div>
-        </div>
+        </header>
 
-        <section id="setup-status" class="setup-status">Loading default setup...</section>
-
-        <section id="setup-view" class="setup-view" hidden>
-            <div class="setup-title-row">
+        <section class="quick-actions">
+            <div class="section-header compact">
                 <div>
-                    <h2 id="setup-title"></h2>
-                    <p id="setup-annotation"></p>
+                    <h2>Acciones rapidas</h2>
+                    <p>Abre la vista que necesitas para este juego y pista.</p>
                 </div>
             </div>
 
-            <div id="setup-meta" class="setup-meta"></div>
-            <div id="setup-groups" class="setup-groups"></div>
+            <div class="quick-action-grid">
+                <button class="quick-action-card">
+                    <span>Comunidad</span>
+                    <strong>Ver registros</strong>
+                </button>
+                <button class="quick-action-card">
+                    <span>Mis setups</span>
+                    <strong>Administrar</strong>
+                </button>
+                <button class="quick-action-card">
+                    <span>Nuevo registro</span>
+                    <strong>Crear setup</strong>
+                </button>
+            </div>
+        </section>
 
-            <details class="raw-json-panel">
-                <summary>Raw JSON</summary>
-                <pre id="setup-json"></pre>
-            </details>
+        <section class="latest-section">
+            <div class="section-header compact">
+                <div>
+                    <h2>Ultimos registros</h2>
+                    <p>Resumen rapido de registros disponibles para la seleccion actual.</p>
+                </div>
+            </div>
+
+            <div class="latest-records">
+                <article class="record-card">
+                    <div>
+                        <span class="chip">Base</span>
+                        <h3>Setup base</h3>
+                        <p>Referencia inicial del circuito seleccionado.</p>
+                    </div>
+                    <button class="btn-secondary">Ver registro</button>
+                </article>
+                <article class="record-card">
+                    <div>
+                        <span class="chip">Comunidad</span>
+                        <h3>Registros publicos</h3>
+                        <p>Setups compartidos por otros pilotos.</p>
+                    </div>
+                    <button class="btn-secondary">Ver registro</button>
+                </article>
+                <article class="record-card">
+                    <div>
+                        <span class="chip">Personal</span>
+                        <h3>Tus registros</h3>
+                        <p>Setups guardados con tu cuenta.</p>
+                    </div>
+                    <button class="btn-secondary">Ver registro</button>
+                </article>
+            </div>
+        </section>
+
+        <section class="setup-panel">
+            <div class="section-header compact">
+                <div>
+                    <h2>Setup base</h2>
+                    <p>Valores cargados desde el endpoint publico.</p>
+                </div>
+            </div>
+
+            <section id="setup-status" class="setup-status">Cargando setup base...</section>
+
+            <section id="setup-view" class="setup-view" hidden>
+                <div class="setup-title-row">
+                    <div>
+                        <h2 id="setup-title"></h2>
+                        <p id="setup-annotation"></p>
+                    </div>
+                </div>
+
+                <div id="setup-meta" class="setup-meta"></div>
+                <div id="setup-groups" class="setup-groups"></div>
+
+                <details class="raw-json-panel">
+                    <summary>JSON original</summary>
+                    <pre id="setup-json"></pre>
+                </details>
+            </section>
         </section>
     </main>
 </div>
