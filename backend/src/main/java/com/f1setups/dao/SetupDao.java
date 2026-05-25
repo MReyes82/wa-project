@@ -342,7 +342,8 @@ public class SetupDao implements Dao<Setup>
      */
     public Setup getDefaultSetup(int gameVersionId, int trackId)
     {
-        String query = "SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ?";
+        String query = "SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ? " +
+                "ORDER BY CASE session_type WHEN 'QUALIFYING' THEN 1 WHEN 'RACE' THEN 2 ELSE 3 END, id";
 
         try (Connection con = DatabaseUtil.getConnection();
             PreparedStatement ps = con.prepareStatement(query))
@@ -364,6 +365,42 @@ public class SetupDao implements Dao<Setup>
             System.err.println("[SetupDao] Error in getDefaultSetup: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Retrieves every default setup for a selected game and track.
+     * This returns the qualifying and race templates that share the reserved default user.
+     * @param gameVersionId selected game version id
+     * @param trackId selected track id
+     * @return ordered list of matching default setups
+     */
+    public List<Setup> getDefaultSetups(int gameVersionId, int trackId)
+    {
+        String query = "SELECT * FROM setup WHERE user_id = ? AND game_version_id = ? AND track_id = ? " +
+                "ORDER BY CASE session_type WHEN 'QUALIFYING' THEN 1 WHEN 'RACE' THEN 2 ELSE 3 END, id";
+        List<Setup> setups = new ArrayList<>();
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, DEFAULT_SETUP_USER_ID);
+            ps.setInt(2, gameVersionId);
+            ps.setInt(3, trackId);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    setups.add(mapRowToSetup(rs));
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in getDefaultSetups: " + e.getMessage());
+        }
+
+        return setups;
     }
 
     /**

@@ -37,6 +37,27 @@ public class SetupService
     }
 
     /**
+     * Returns all default setup templates registered for a specific game and track.
+     * The DAO orders qualifying before race so the UI can display the expected flow.
+     * @param game game version id
+     * @param track track id
+     * @return matching default setup templates
+     * @throws Exception if the selected ids are invalid or no default setups exist
+     */
+    public List<Setup> getDefaultSetups(int game, int track) throws Exception
+    {
+        validateSelection(game, track);
+
+        List<Setup> defaultSetups = setupDao.getDefaultSetups(game, track);
+        if (defaultSetups.isEmpty())
+        {
+            throw new Exception("[SetupService] Default setups not found");
+        }
+
+        return defaultSetups;
+    }
+
+    /**
      * Returns public community setups for a specific game and track.
      * Default setups are excluded in the DAO layer.
      * @param game game version id

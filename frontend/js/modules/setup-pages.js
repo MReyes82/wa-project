@@ -100,17 +100,48 @@
                 return;
             }
 
-            showSetupStatus('Cargando setup base...');
+            showSetupStatus('Cargando setups base...');
 
             try {
-                const setup = await getDefaultSetup(gameId, trackId);
-                ui.renderDefaultSetup(setup, gameId, trackId);
+                const setups = sortDefaultSetups(ui.asSetupArray(await getDefaultSetups(gameId, trackId)));
+                ui.renderDefaultSetups(setups, gameId, trackId, createDefaultSetupActions);
             } catch (error) {
                 showSetupStatus(error.message, 'Cambiar pista', () => {
                     localStorage.removeItem(storageKeys.trackId);
                     routeUser();
                 });
             }
+        }
+
+        function sortDefaultSetups(setups) {
+            const sessionOrder = {
+                QUALIFYING: 1,
+                RACE: 2
+            };
+
+            return [...setups].sort((left, right) => {
+                const leftOrder = sessionOrder[left.sessionType] || 3;
+                const rightOrder = sessionOrder[right.sessionType] || 3;
+
+                return leftOrder - rightOrder;
+            });
+        }
+
+        function createDefaultSetupActions() {
+            return [
+                {
+                    label: 'Editar',
+                    className: 'btn-secondary',
+                    handler: (setup) => {
+                        if (!localStorage.getItem(storageKeys.authToken)) {
+                            window.alert('Debes iniciar sesion para crear un setup desde el setup base.');
+                            return;
+                        }
+
+                        openCreateSetup(setup);
+                    }
+                }
+            ];
         }
 
         function initDashboardSetups() {
@@ -415,7 +446,7 @@
             navigateTo('view-setup');
         }
 
-        function openCreateSetup() {
+        function openCreateSetup(seedSetup = null) {
             if (!requireAuth()) {
                 return;
             }
@@ -423,8 +454,27 @@
             localStorage.setItem(storageKeys.setupSource, setupSources.my);
             localStorage.setItem(storageKeys.setupMode, setupModes.create);
             localStorage.removeItem(storageKeys.selectedSetupId);
-            localStorage.removeItem(storageKeys.selectedSetupJson);
+
+            if (seedSetup) {
+                // Default setups are public templates; editing them starts a private create flow with copied values.
+                localStorage.setItem(storageKeys.selectedSetupJson, JSON.stringify(createSetupDraft(seedSetup)));
+            } else {
+                localStorage.removeItem(storageKeys.selectedSetupJson);
+            }
+
             navigateTo('view-setup');
+        }
+
+        function createSetupDraft(seedSetup) {
+            const draft = createBlankSetup();
+
+            config.setupFormFields.forEach(fieldName => {
+                if (seedSetup[fieldName] !== undefined && seedSetup[fieldName] !== null) {
+                    draft[fieldName] = seedSetup[fieldName];
+                }
+            });
+
+            return draft;
         }
 
         async function deleteUserSetupFromList(setup) {
@@ -783,7 +833,7 @@
             configureViewActions(mode, source, false);
 
             if (mode === setupModes.create) {
-                showSetupForm(createBlankSetup(), mode);
+                showSetupForm(getStoredSelectedSetup() || createBlankSetup(), mode);
                 return;
             }
 

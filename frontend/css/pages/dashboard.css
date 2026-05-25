@@ -225,9 +225,33 @@
     display: none;
 }
 
+.default-setup-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.default-setup-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    background-color: rgba(24, 24, 27, 0.64);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
 .setup-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
     padding-bottom: 18px;
     border-bottom: 1px solid var(--color-border);
+}
+
+.setup-title-row .btn-secondary {
+    flex-shrink: 0;
 }
 
 .setup-title-row h2 {
@@ -338,5 +362,13 @@
 
     .dashboard-card {
         min-height: 170px;
+    }
+
+    .setup-title-row {
+        flex-direction: column;
+    }
+
+    .setup-title-row .btn-secondary {
+        width: 100%;
     }
 }

@@ -140,6 +140,27 @@ async function getDefaultSetup(gameId, trackId)
     return setup;
 }
 
+async function getDefaultSetups(gameId, trackId)
+{
+    if (!gameId || !trackId)
+    {
+        throw new Error('Selecciona un juego y una pista antes de cargar los setups base.');
+    }
+
+    // Public route for every default setup template on the selected game and track.
+    const url = new URL(`${API_BASE_URL}/setups/defaults`);
+    url.searchParams.set('gameId', gameId);
+    url.searchParams.set('trackId', trackId);
+
+    return await requestJson(url.toString(),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    }, 'No se pudieron cargar los setups base');
+}
+
 async function getCommunitySetups(gameId, trackId)
 {
     if (!gameId || !trackId)

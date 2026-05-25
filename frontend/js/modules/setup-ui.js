@@ -321,29 +321,69 @@
         });
     }
 
-    function renderDefaultSetup(setup, gameId, trackId) {
+    function renderDefaultSetups(setups, gameId, trackId, createActions = () => []) {
         const status = document.getElementById('setup-status');
         const setupView = document.getElementById('setup-view');
-        const setupTitle = document.getElementById('setup-title');
-        const setupAnnotation = document.getElementById('setup-annotation');
-        const setupMeta = document.getElementById('setup-meta');
-        const setupGroupsContainer = document.getElementById('setup-groups');
+        const defaultSetupList = document.getElementById('default-setup-list');
         const setupJson = document.getElementById('setup-json');
         const rawJsonPanel = document.getElementById('raw-json-panel');
 
         // Flag to toggle debug mode
         status.hidden = true;
         setupView.hidden = false;
+        defaultSetupList.textContent = '';
 
-        setupTitle.textContent = setup.title || 'Setup base';
-        setupAnnotation.textContent = setup.annotation || '';
-        setupMeta.textContent = '';
-        setupGroupsContainer.textContent = '';
+        setups.forEach(setup => {
+            defaultSetupList.appendChild(createDefaultSetupSection(setup, gameId, trackId, createActions(setup)));
+        });
 
         if (rawJsonPanel && setupJson) {
             rawJsonPanel.hidden = !config.debug.showRawSetupJson;
-            setupJson.textContent = config.debug.showRawSetupJson ? JSON.stringify(setup, null, 2) : '';
+            setupJson.textContent = config.debug.showRawSetupJson ? JSON.stringify(setups, null, 2) : '';
         }
+    }
+
+    function renderDefaultSetup(setup, gameId, trackId) {
+        renderDefaultSetups([setup], gameId, trackId);
+    }
+
+    function createDefaultSetupSection(setup, gameId, trackId, actions) {
+        const setupSection = document.createElement('article');
+        setupSection.className = 'default-setup-card';
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'setup-title-row';
+
+        const titleContent = document.createElement('div');
+
+        const setupTitle = document.createElement('h2');
+        setupTitle.textContent = setup.title || 'Setup base';
+
+        const setupAnnotation = document.createElement('p');
+        setupAnnotation.textContent = setup.annotation || '';
+
+        titleContent.appendChild(setupTitle);
+        titleContent.appendChild(setupAnnotation);
+        titleRow.appendChild(titleContent);
+
+        if (actions.length) {
+            const actionsContainer = document.createElement('div');
+            actionsContainer.className = 'setup-title-actions';
+
+            actions.forEach(action => {
+                const button = document.createElement('button');
+                button.className = action.className;
+                button.type = 'button';
+                button.textContent = action.label;
+                button.addEventListener('click', () => action.handler(setup));
+                actionsContainer.appendChild(button);
+            });
+
+            titleRow.appendChild(actionsContainer);
+        }
+
+        const setupMeta = document.createElement('div');
+        setupMeta.className = 'setup-meta';
 
         [
             ['Juego', catalog.getGameLabel(gameId)],
@@ -355,6 +395,9 @@
         ].forEach(([label, value]) => {
             setupMeta.appendChild(createSetupField(label, value));
         });
+
+        const setupGroupsContainer = document.createElement('div');
+        setupGroupsContainer.className = 'setup-groups';
 
         config.setupGroups.forEach(group => {
             const groupElement = document.createElement('article');
@@ -370,6 +413,12 @@
 
             setupGroupsContainer.appendChild(groupElement);
         });
+
+        setupSection.appendChild(titleRow);
+        setupSection.appendChild(setupMeta);
+        setupSection.appendChild(setupGroupsContainer);
+
+        return setupSection;
     }
 
     function renderReadSetup(setup, gameId, trackId) {
@@ -433,6 +482,7 @@
         renderTrackOptions,
         renderSetupCards,
         renderDefaultSetup,
+        renderDefaultSetups,
         renderReadSetup
     };
 })();

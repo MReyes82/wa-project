@@ -53,6 +53,13 @@ public class SetupController implements HttpHandler
 
         try
         {
+            // Public default setup list route. It returns qualifying and race defaults for the selected track.
+            if ("GET".equalsIgnoreCase(method) && "/api/setups/defaults".equalsIgnoreCase(path))
+            {
+                getDefaultSetups(httpExchange);
+                return;
+            }
+
             // Public default setup route. The plain /api/setups path stays as a temporary compatibility alias.
             if ("GET".equalsIgnoreCase(method) &&
                     ("/api/setups".equalsIgnoreCase(path) || "/api/setups/default".equalsIgnoreCase(path)))
@@ -109,6 +116,27 @@ public class SetupController implements HttpHandler
             int trackId = getRequiredIntParam(params, "trackId");
 
             sendJson(httpExchange, 200, setupService.getDefaultSetup(gameId, trackId));
+        }
+        catch (Exception e)
+        {
+            sendServiceError(httpExchange, e);
+        }
+    }
+
+    /**
+     * Handles the public default setup list endpoint for a selected game and track.
+     * @param httpExchange active HTTP exchange
+     * @throws IOException if writing the response fails
+     */
+    private void getDefaultSetups(HttpExchange httpExchange) throws IOException
+    {
+        try
+        {
+            Map<String, String> params = parseQueryParams(httpExchange.getRequestURI().getQuery());
+            int gameId = getRequiredIntParam(params, "gameId");
+            int trackId = getRequiredIntParam(params, "trackId");
+
+            sendJson(httpExchange, 200, setupService.getDefaultSetups(gameId, trackId));
         }
         catch (Exception e)
         {

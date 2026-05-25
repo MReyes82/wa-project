@@ -9,8 +9,8 @@
 
         <nav class="sidebar-nav">
             <button id="btn-sidebar-dashboard" class="btn-secondary">Mi garaje</button>
-            <button id="btn-sidebar-my-setups" class="btn-secondary">My Setups</button>
-            <button id="btn-sidebar-community-setups" class="btn-secondary">Explore Setups</button>
+            <button id="btn-sidebar-my-setups" class="btn-secondary">Mis setups</button>
+            <button id="btn-sidebar-community-setups" class="btn-secondary">Explorar setups</button>
             <button id="btn-change-track" class="btn-secondary">Cambiar pista</button>
             <button id="btn-change-game" class="btn-secondary">Cambiar juego</button>
         </nav>
@@ -40,7 +40,7 @@
             <div class="quick-action-grid">
                 <button id="btn-latest-default" class="quick-action-card">
                     <span>Base</span>
-                    <strong>Ver setup base</strong>
+                    <strong>Ver setups base</strong>
                 </button>
                 <button id="btn-new-setup" class="quick-action-card">
                     <span>Nuevo registro</span>
@@ -86,7 +86,7 @@
         <section class="community-section">
             <div class="section-header compact">
                 <div>
-                    <h2>Community setups</h2>
+                    <h2>Setups de comunidad</h2>
                     <p>Ultimos registros compartidos para la pista actual.</p>
                 </div>
             </div>
@@ -97,23 +97,14 @@
         <section class="setup-panel">
             <div class="section-header compact">
                 <div>
-                    <h2>Setup base</h2>
-                    <p>Valores cargados desde el endpoint publico.</p>
+                    <h2>Setups base para la pista actual</h2>
                 </div>
             </div>
 
-            <section id="setup-status" class="setup-status">Cargando setup base...</section>
+            <section id="setup-status" class="setup-status">Cargando setups base...</section>
 
             <section id="setup-view" class="setup-view" hidden>
-                <div class="setup-title-row">
-                    <div>
-                        <h2 id="setup-title"></h2>
-                        <p id="setup-annotation"></p>
-                    </div>
-                </div>
-
-                <div id="setup-meta" class="setup-meta"></div>
-                <div id="setup-groups" class="setup-groups"></div>
+                <div id="default-setup-list" class="default-setup-list"></div>
 
                 <details id="raw-json-panel" class="raw-json-panel" hidden>
                     <summary>JSON original</summary>
