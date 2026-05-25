@@ -144,14 +144,16 @@
 
             bindClick('btn-dashboard-my-search', () => {
                 if (requireAuth()) {
-                    saveDashboardSearch('my', 'dashboard-my-search');
-                    navigateTo('see-my-setups');
+                    if (saveDashboardSearch('my', 'dashboard-my-search')) {
+                        navigateTo('search-results');
+                    }
                 }
             });
 
             bindClick('btn-dashboard-community-search', () => {
-                saveDashboardSearch('community', 'dashboard-community-search');
-                navigateTo('see-community-setups');
+                if (saveDashboardSearch('community', 'dashboard-community-search')) {
+                    navigateTo('search-results');
+                }
             });
 
             loadDefaultSetup();
@@ -160,10 +162,35 @@
         }
 
         function saveDashboardSearch(source, inputId) {
-            const query = document.getElementById(inputId)?.value || '';
+            const query = getValidSearchQuery(document.getElementById(inputId));
+            if (!query) {
+                return false;
+            }
 
             localStorage.setItem(storageKeys.setupSearchSource, source);
-            localStorage.setItem(storageKeys.setupSearchQuery, query.trim());
+            localStorage.setItem(storageKeys.setupSearchQuery, query);
+
+            return true;
+        }
+
+        function getValidSearchQuery(input) {
+            const query = input?.value.trim() || '';
+
+            if (query) {
+                input?.setCustomValidity('');
+                return query;
+            }
+
+            if (input) {
+                input.setCustomValidity('Ingresa un nombre de setup para buscar.');
+                input.reportValidity();
+                input.focus();
+                input.addEventListener('input', () => {
+                    input.setCustomValidity('');
+                }, { once: true });
+            }
+
+            return '';
         }
 
         async function loadDashboardLatestUserSetup() {
@@ -540,6 +567,130 @@
                         label: 'Eliminar',
                         className: 'btn-ghost danger-action',
                         handler: deleteUserSetupFromList
+                    }
+                ]
+            );
+        }
+
+        function initSearchResultsLogic() {
+            const source = getSearchSource();
+
+            if (source === setupSources.my && !requireAuth()) {
+                return;
+            }
+
+            bindClick('btn-search-back-dashboard', () => {
+                navigateTo('dashboard');
+            });
+
+            const form = document.getElementById('search-results-form');
+            const input = document.getElementById('search-results-query');
+
+            if (input) {
+                input.value = localStorage.getItem(storageKeys.setupSearchQuery) || '';
+            }
+
+            if (form) {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    const query = getValidSearchQuery(input);
+                    if (query) {
+                        saveSearchQuery(query);
+                        loadSearchResults();
+                    }
+                });
+            }
+
+            setSearchResultsHeader(source);
+            loadSearchResults();
+        }
+
+        function getSearchSource() {
+            const source = localStorage.getItem(storageKeys.setupSearchSource);
+
+            return source === setupSources.my ? setupSources.my : setupSources.community;
+        }
+
+        function setSearchResultsHeader(source) {
+            const badge = document.getElementById('search-results-badge');
+            const context = document.getElementById('search-results-context');
+            const { gameId, trackId } = getCurrentSelection();
+            const sourceLabel = source === setupSources.my ? 'Mis setups' : 'Comunidad';
+
+            if (badge) {
+                badge.textContent = sourceLabel;
+            }
+
+            if (context) {
+                context.textContent = `${catalog.getSelectionLabel(gameId, trackId)} / busqueda en la pista actual`;
+            }
+        }
+
+        function saveSearchQuery(query) {
+            localStorage.setItem(storageKeys.setupSearchQuery, query.trim());
+        }
+
+        async function loadSearchResults() {
+            const source = getSearchSource();
+            const { gameId, trackId } = getCurrentSelection();
+            const query = (localStorage.getItem(storageKeys.setupSearchQuery) || '').trim();
+
+            if (!query) {
+                showListStatus(
+                    'search-results-status',
+                    'search-results-list',
+                    'Ingresa un nombre de setup para buscar.'
+                );
+                return;
+            }
+
+            if (!gameId || !trackId) {
+                showListStatus(
+                    'search-results-status',
+                    'search-results-list',
+                    'Selecciona un juego y una pista antes de buscar setups.'
+                );
+                return;
+            }
+
+            showListStatus('search-results-status', 'search-results-list', 'Buscando setups...');
+
+            try {
+                // The current API only exposes lists by game and track, so search is scoped to the selected track.
+                const response = source === setupSources.my
+                    ? await getMySetups(gameId, trackId)
+                    : await getCommunitySetups(gameId, trackId);
+                const results = filterSetupsByTitle(ui.asSetupArray(response), query);
+
+                renderSearchResults(results, source, 'No hay setups con ese nombre para la pista actual.');
+            } catch (error) {
+                showListStatus('search-results-status', 'search-results-list', error.message);
+            }
+        }
+
+        function filterSetupsByTitle(setups, query) {
+            const normalizedQuery = query.trim().toLowerCase();
+
+            if (!normalizedQuery) {
+                return setups;
+            }
+
+            return setups.filter(setup => ui.getSetupTitle(setup).toLowerCase().includes(normalizedQuery));
+        }
+
+        function renderSearchResults(setups, source, emptyMessage) {
+            renderSetupCards(
+                setups,
+                source,
+                'search-results-list',
+                'search-results-status',
+                emptyMessage,
+                [
+                    {
+                        label: 'Ver',
+                        className: 'btn-secondary',
+                        handler: (setup) => openSetupRead(setup, source)
                     }
                 ]
             );
@@ -1017,6 +1168,7 @@
             initDashboardSetups,
             initCommunitySetupsLogic,
             initMySetupsLogic,
+            initSearchResultsLogic,
             initViewSetupLogic
         };
     }

@@ -1,0 +1,25 @@
+<main class="search-results-page page-shell">
+    <header class="section-header">
+        <div>
+            <span id="search-results-badge" class="badge">Busqueda</span>
+            <h1>Resultados</h1>
+            <p id="search-results-context">Registros encontrados para la seleccion actual.</p>
+        </div>
+        <button id="btn-search-back-dashboard" class="btn-secondary">Volver</button>
+    </header>
+
+    <section class="search-panel surface-card">
+        <form id="search-results-form" class="search-form">
+            <div class="input-group">
+                <label for="search-results-query">Nombre del setup</label>
+                <input id="search-results-query" type="search" placeholder="Nombre del setup" required>
+            </div>
+            <button class="btn-primary" type="submit">Buscar</button>
+        </form>
+    </section>
+
+    <section class="setups-list-panel">
+        <div id="search-results-status" class="empty-state">Preparando busqueda...</div>
+        <div id="search-results-list" class="setup-list"></div>
+    </section>
+</main>

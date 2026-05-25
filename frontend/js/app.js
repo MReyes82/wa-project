@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'track-select': initTrackSelectLogic,
                 'see-community-setups': setupPages.initCommunitySetupsLogic,
                 'see-my-setups': setupPages.initMySetupsLogic,
+                'search-results': setupPages.initSearchResultsLogic,
                 'view-setup': setupPages.initViewSetupLogic
             };
 
