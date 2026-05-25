@@ -278,13 +278,16 @@
         const metadata = document.createElement('div');
         metadata.className = 'setup-list-meta';
 
-        [
+        const metadataValues = [
+            setup.username ? `Por ${setup.username}` : '',
             catalog.getTeamLabel(setup.teamId),
             formatEnum(setup.sessionType),
             formatEnum(setup.controllerType),
             catalog.getSetupWeatherLabel(setup),
             formatDate(setup.createdAt)
-        ].forEach(value => {
+        ].filter(Boolean);
+
+        metadataValues.forEach(value => {
             const item = document.createElement('span');
             item.textContent = value;
             metadata.appendChild(item);

@@ -182,6 +182,26 @@ async function getCommunitySetups(gameId, trackId)
     }, 'No se pudieron cargar los setups de la comunidad');
 }
 
+async function searchCommunitySetups(gameId, query)
+{
+    if (!gameId || !query?.trim())
+    {
+        throw new Error('Ingresa un juego y un nombre de setup para buscar.');
+    }
+
+    const url = new URL(`${API_BASE_URL}/setups/community/search`);
+    url.searchParams.set('gameId', gameId);
+    url.searchParams.set('query', query.trim());
+
+    return await requestJson(url.toString(),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    }, 'No se pudo buscar en los setups de la comunidad');
+}
+
 async function getMySetups(gameId, trackId)
 {
     if (!gameId || !trackId)
@@ -201,6 +221,27 @@ async function getMySetups(gameId, trackId)
             ...getAuthHeaders()
         }
     }, 'No se pudieron cargar tus setups');
+}
+
+async function searchMySetups(gameId, query)
+{
+    if (!gameId || !query?.trim())
+    {
+        throw new Error('Ingresa un juego y un nombre de setup para buscar.');
+    }
+
+    const url = new URL(`${API_BASE_URL}/setups/me/search`);
+    url.searchParams.set('gameId', gameId);
+    url.searchParams.set('query', query.trim());
+
+    return await requestJson(url.toString(),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            ...getAuthHeaders()
+        }
+    }, 'No se pudo buscar en tus setups');
 }
 
 async function getMySetup(setupId)

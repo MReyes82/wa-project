@@ -284,7 +284,9 @@
             container.textContent = '';
 
             try {
-                const setups = sortSetupsByDate(ui.asSetupArray(await getCommunitySetups(gameId, trackId))).slice(0, 3);
+                const setups = sortSetupsByDate(
+                    ui.asSetupArray(await getCommunitySetups(gameId, trackId)).map(normalizeSetupResult)
+                ).slice(0, 3);
 
                 if (!setups.length) {
                     container.appendChild(createDashboardStatusCard('No hay registros de comunidad para esta pista.'));
@@ -310,7 +312,7 @@
             emoji.textContent = '👤';
 
             const title = document.createElement('h3');
-            title.textContent = `Usuario ${setup.userId || '-'}`;
+            title.textContent = getSetupAuthorLabel(setup);
 
             author.appendChild(emoji);
             author.appendChild(title);
@@ -331,6 +333,10 @@
             card.appendChild(button);
 
             return card;
+        }
+
+        function getSetupAuthorLabel(setup) {
+            return setup.username || setup.authorUsername || setup.author || 'Autor sin nombre';
         }
 
         function createDashboardStatusCard(message) {
@@ -520,7 +526,7 @@
             showListStatus('community-setups-status', 'community-setups-list', 'Cargando registros publicos...');
 
             try {
-                cachedCommunitySetups = ui.asSetupArray(await getCommunitySetups(gameId, trackId));
+                cachedCommunitySetups = ui.asSetupArray(await getCommunitySetups(gameId, trackId)).map(normalizeSetupResult);
                 renderCommunitySetups();
             } catch (error) {
                 showListStatus('community-setups-status', 'community-setups-list', error.message);
@@ -665,7 +671,7 @@
         function setSearchResultsHeader(source) {
             const badge = document.getElementById('search-results-badge');
             const context = document.getElementById('search-results-context');
-            const { gameId, trackId } = getCurrentSelection();
+            const { gameId } = getCurrentSelection();
             const sourceLabel = source === setupSources.my ? 'Mis setups' : 'Comunidad';
 
             if (badge) {
@@ -673,7 +679,7 @@
             }
 
             if (context) {
-                context.textContent = `${catalog.getSelectionLabel(gameId, trackId)} / busqueda en la pista actual`;
+                context.textContent = `${catalog.getGameLabel(gameId)} / busqueda en todas las pistas`;
             }
         }
 
@@ -683,7 +689,7 @@
 
         async function loadSearchResults() {
             const source = getSearchSource();
-            const { gameId, trackId } = getCurrentSelection();
+            const { gameId } = getCurrentSelection();
             const query = (localStorage.getItem(storageKeys.setupSearchQuery) || '').trim();
 
             if (!query) {
@@ -695,11 +701,11 @@
                 return;
             }
 
-            if (!gameId || !trackId) {
+            if (!gameId) {
                 showListStatus(
                     'search-results-status',
                     'search-results-list',
-                    'Selecciona un juego y una pista antes de buscar setups.'
+                    'Selecciona un juego antes de buscar setups.'
                 );
                 return;
             }
@@ -707,26 +713,24 @@
             showListStatus('search-results-status', 'search-results-list', 'Buscando setups...');
 
             try {
-                // The current API only exposes lists by game and track, so search is scoped to the selected track.
                 const response = source === setupSources.my
-                    ? await getMySetups(gameId, trackId)
-                    : await getCommunitySetups(gameId, trackId);
-                const results = filterSetupsByTitle(ui.asSetupArray(response), query);
+                    ? await searchMySetups(gameId, query)
+                    : await searchCommunitySetups(gameId, query);
+                const results = ui.asSetupArray(response).map(normalizeSetupResult);
 
-                renderSearchResults(results, source, 'No hay setups con ese nombre para la pista actual.');
+                renderSearchResults(results, source, 'No hay setups con ese nombre para este juego.');
             } catch (error) {
                 showListStatus('search-results-status', 'search-results-list', error.message);
             }
         }
 
-        function filterSetupsByTitle(setups, query) {
-            const normalizedQuery = query.trim().toLowerCase();
+        function normalizeSetupResult(result) {
+            const setup = result?.setup || result || {};
 
-            if (!normalizedQuery) {
-                return setups;
-            }
-
-            return setups.filter(setup => ui.getSetupTitle(setup).toLowerCase().includes(normalizedQuery));
+            return {
+                ...setup,
+                username: result?.username || setup.username || ''
+            };
         }
 
         function renderSearchResults(setups, source, emptyMessage) {
