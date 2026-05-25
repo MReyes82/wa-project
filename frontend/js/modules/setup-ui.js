@@ -206,6 +206,59 @@
         return row;
     }
 
+    function createReadRangeRow(label, value, gameId, fieldName) {
+        const rule = window.F1SetupRanges?.getFieldRule(gameId, fieldName);
+
+        if (!rule) {
+            return createReadRow(label, value);
+        }
+
+        if (!rule.available) {
+            return null;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'read-range-row';
+
+        const header = document.createElement('div');
+        header.className = 'range-row-header';
+
+        const labelElement = document.createElement('span');
+        labelElement.textContent = label;
+
+        const valueElement = document.createElement('strong');
+        valueElement.textContent = `${formatValue(value)}${rule.unit || ''}`;
+
+        header.appendChild(labelElement);
+        header.appendChild(valueElement);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = rule.min;
+        slider.max = rule.max;
+        slider.step = rule.step;
+        slider.value = window.F1SetupRanges.clampFieldValue(gameId, fieldName, value);
+        slider.disabled = true;
+
+        const limits = document.createElement('div');
+        limits.className = 'range-limits';
+
+        const min = document.createElement('span');
+        min.textContent = `${rule.min}${rule.unit || ''}`;
+
+        const max = document.createElement('span');
+        max.textContent = `${rule.max}${rule.unit || ''}`;
+
+        limits.appendChild(min);
+        limits.appendChild(max);
+
+        row.appendChild(header);
+        row.appendChild(slider);
+        row.appendChild(limits);
+
+        return row;
+    }
+
     function createSetupCard(setup, source, actions) {
         const card = document.createElement('article');
         card.className = 'setup-list-card';
@@ -356,7 +409,11 @@
             groupElement.appendChild(groupTitle);
 
             group.fields.forEach(([label, property]) => {
-                groupElement.appendChild(createReadRow(label, setup[property]));
+                const row = createReadRangeRow(label, setup[property], gameId, property);
+
+                if (row) {
+                    groupElement.appendChild(row);
+                }
             });
 
             readGroups.appendChild(groupElement);

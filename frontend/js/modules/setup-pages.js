@@ -17,6 +17,10 @@
         const { storageKeys, setupModes, setupSources } = config;
         let cachedCommunitySetups = [];
         let cachedMySetups = [];
+        const numericSetupFields = [
+            ...config.integerSetupFields,
+            ...config.decimalSetupFields
+        ];
 
         function getSetupId(setup) {
             return ui.getSetupId(setup);
@@ -565,6 +569,7 @@
             const readMode = document.getElementById('setup-read-mode');
             const setupForm = document.getElementById('setup-form');
             const saveButton = document.getElementById('btn-save-setup');
+            const { gameId } = getCurrentSelection();
 
             hideViewStatus();
             configureViewActions(mode, setupSources.my, false);
@@ -573,6 +578,7 @@
             saveButton.textContent = mode === setupModes.edit ? 'Guardar cambios' : 'Crear setup';
 
             populateSetupForm(setup);
+            configureRangeInputs(gameId);
         }
 
         function populateSetupForm(setup) {
@@ -588,6 +594,146 @@
                     field.value = setup[fieldName] ?? '';
                 }
             });
+        }
+
+        function configureRangeInputs(gameId) {
+            numericSetupFields.forEach(fieldName => {
+                const input = document.querySelector(`[name="${fieldName}"]`);
+                const rule = window.F1SetupRanges?.getFieldRule(gameId, fieldName);
+
+                if (!input || !rule) {
+                    return;
+                }
+
+                const inputGroup = input.closest('.input-group');
+                if (inputGroup) {
+                    inputGroup.dataset.setupField = fieldName;
+                }
+
+                if (!rule.available) {
+                    hideUnavailableRangeField(inputGroup, input, fieldName);
+                    return;
+                }
+
+                showRangeField(inputGroup, input, rule, gameId, fieldName);
+            });
+        }
+
+        function hideUnavailableRangeField(inputGroup, input, fieldName) {
+            if (inputGroup) {
+                inputGroup.hidden = true;
+            }
+
+            input.type = 'hidden';
+            input.required = false;
+            input.value = window.F1SetupRanges.getHiddenFieldValue(fieldName);
+        }
+
+        function showRangeField(inputGroup, input, rule, gameId, fieldName) {
+            const clampedValue = window.F1SetupRanges.clampFieldValue(gameId, fieldName, input.value);
+
+            if (inputGroup) {
+                inputGroup.hidden = false;
+            }
+
+            input.required = true;
+            input.min = rule.min;
+            input.max = rule.max;
+            input.step = rule.step;
+            input.value = clampedValue;
+
+            const slider = ensureRangeSlider(input, rule, fieldName);
+            const output = ensureRangeOutput(input, rule);
+            const label = inputGroup?.querySelector('label');
+
+            input.type = 'hidden';
+            input.required = false;
+
+            if (label) {
+                label.htmlFor = slider.id;
+            }
+
+            slider.min = rule.min;
+            slider.max = rule.max;
+            slider.step = rule.step;
+            slider.value = clampedValue;
+            output.textContent = `${input.value}${rule.unit || ''}`;
+
+            input.oninput = () => {
+                syncNumberToSlider(input, slider, output, rule, gameId, fieldName);
+            };
+
+            slider.oninput = () => {
+                input.value = slider.value;
+                output.textContent = `${input.value}${rule.unit || ''}`;
+            };
+
+            input.onblur = () => {
+                input.value = window.F1SetupRanges.clampFieldValue(gameId, fieldName, input.value);
+                slider.value = input.value;
+                output.textContent = `${input.value}${rule.unit || ''}`;
+            };
+        }
+
+        function ensureRangeSlider(input, rule, fieldName) {
+            let slider = document.getElementById(`${fieldName}-range`);
+
+            if (!slider) {
+                slider = document.createElement('input');
+                slider.id = `${fieldName}-range`;
+                slider.type = 'range';
+                slider.className = 'setup-range-slider';
+                input.insertAdjacentElement('afterend', slider);
+            }
+
+            slider.setAttribute('aria-label', `${fieldName} slider`);
+
+            return slider;
+        }
+
+        function ensureRangeOutput(input, rule) {
+            let output = input.parentElement.querySelector('.range-value');
+
+            if (!output) {
+                output = document.createElement('span');
+                output.className = 'range-value';
+                input.insertAdjacentElement('afterend', output);
+            }
+
+            ensureRangeLimits(input, rule);
+
+            return output;
+        }
+
+        function ensureRangeLimits(input, rule) {
+            let limits = input.parentElement.querySelector('.range-limits');
+
+            if (!limits) {
+                limits = document.createElement('div');
+                limits.className = 'range-limits';
+
+                const min = document.createElement('span');
+                min.className = 'range-min';
+
+                const max = document.createElement('span');
+                max.className = 'range-max';
+
+                limits.appendChild(min);
+                limits.appendChild(max);
+                input.parentElement.appendChild(limits);
+            }
+
+            limits.querySelector('.range-min').textContent = `${rule.min}${rule.unit || ''}`;
+            limits.querySelector('.range-max').textContent = `${rule.max}${rule.unit || ''}`;
+        }
+
+        function syncNumberToSlider(input, slider, output, rule, gameId, fieldName) {
+            const value = input.value === ''
+                ? rule.min
+                : window.F1SetupRanges.clampFieldValue(gameId, fieldName, input.value);
+
+            slider.value = value;
+            output.textContent = `${input.value || value}${rule.unit || ''}`;
         }
 
         function parseNumberField(formData, fieldName, parser) {
@@ -628,14 +774,28 @@
             };
 
             config.integerSetupFields.forEach(fieldName => {
-                payload[fieldName] = parseNumberField(formData, fieldName, Number.parseInt);
+                payload[fieldName] = getNumericPayloadValue(formData, gameId, fieldName, Number.parseInt);
             });
 
             config.decimalSetupFields.forEach(fieldName => {
-                payload[fieldName] = parseNumberField(formData, fieldName, Number.parseFloat);
+                payload[fieldName] = getNumericPayloadValue(formData, gameId, fieldName, Number.parseFloat);
             });
 
             return payload;
+        }
+
+        function getNumericPayloadValue(formData, gameId, fieldName, parser) {
+            const rule = window.F1SetupRanges?.getFieldRule(gameId, fieldName);
+
+            if (rule && !rule.available) {
+                return window.F1SetupRanges.getHiddenFieldValue(fieldName);
+            }
+
+            const value = parseNumberField(formData, fieldName, parser);
+
+            return rule
+                ? window.F1SetupRanges.clampFieldValue(gameId, fieldName, value)
+                : value;
         }
 
         async function handleSetupFormSubmit(event) {

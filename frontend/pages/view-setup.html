@@ -17,10 +17,13 @@
     <section id="setup-read-mode" class="setup-read-panel surface-card">
         <div class="read-title">
             <h2 id="read-setup-title">Setup sin seleccionar</h2>
-            <p id="read-setup-annotation"></p>
         </div>
         <div id="read-setup-meta" class="read-meta-grid"></div>
         <div id="read-setup-groups" class="read-groups-grid"></div>
+        <div class="read-annotation-panel">
+            <h3>Anotaciones</h3>
+            <p id="read-setup-annotation"></p>
+        </div>
     </section>
 
     <form id="setup-form" class="setup-form surface-card" hidden>
@@ -46,10 +49,6 @@
                 <div class="input-group">
                     <label for="setup-weather-input">Clima</label>
                     <select id="setup-weather-input" name="isWetWeather" required></select>
-                </div>
-                <div class="input-group full-width">
-                    <label for="setup-annotation-input">Notas</label>
-                    <textarea id="setup-annotation-input" name="annotation"></textarea>
                 </div>
             </div>
         </section>
@@ -152,6 +151,16 @@
                 <div class="input-group">
                     <label for="rear-left-pressure-input">Presion trasera izquierda</label>
                     <input id="rear-left-pressure-input" name="rearLeftPressure" type="number" step="0.1" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Anotaciones</h2>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label for="setup-annotation-input">Notas</label>
+                    <textarea id="setup-annotation-input" name="annotation"></textarea>
                 </div>
             </div>
         </section>
