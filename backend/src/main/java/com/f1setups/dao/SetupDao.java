@@ -1,5 +1,6 @@
 package com.f1setups.dao;
 
+import com.f1setups.DTO.SetupSearchResult;
 import com.f1setups.models.ControllerType;
 import com.f1setups.models.SessionType;
 import com.f1setups.models.Setup;
@@ -410,10 +411,12 @@ public class SetupDao implements Dao<Setup>
      * @param trackId selected track id
      * @return list of matching non-default setups
      */
-    public List<Setup> getCommunitySetups(int gameVersionId, int trackId)
+    public List<SetupSearchResult> getCommunitySetups(int gameVersionId, int trackId)
     {
-        String query = "SELECT * FROM setup WHERE user_id <> ? AND game_version_id = ? AND track_id = ?";
-        List<Setup> setups = new ArrayList<>();
+        String query = "SELECT s.*, u.username AS username FROM setup s " +
+                "INNER JOIN users u ON u.id = s.user_id " +
+                "WHERE s.user_id <> ? AND s.game_version_id = ? AND s.track_id = ? " +
+                "ORDER BY s.created_at DESC, s.id DESC";
 
         try (Connection con = DatabaseUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(query))
@@ -422,20 +425,93 @@ public class SetupDao implements Dao<Setup>
             ps.setInt(2, gameVersionId);
             ps.setInt(3, trackId);
 
-            try (ResultSet rs = ps.executeQuery())
-            {
-                while (rs.next())
-                {
-                    setups.add(mapRowToSetup(rs));
-                }
-            }
+            return executeSetupSearch(ps);
         }
         catch (SQLException e)
         {
             System.err.println("[SetupDao] Error in getCommunitySetups: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Searches public community setups by title across every track in one game.
+     * Default setup templates are excluded from community search results.
+     * @param gameVersionId selected game version id
+     * @param titleQuery normalized title search text
+     * @return matching setup results with author username
+     */
+    public List<SetupSearchResult> searchCommunitySetups(int gameVersionId, String titleQuery)
+    {
+        String query = "SELECT s.*, u.username AS username FROM setup s " +
+                "INNER JOIN users u ON u.id = s.user_id " +
+                "WHERE s.user_id <> ? AND s.game_version_id = ? AND LOWER(s.title) LIKE ? " +
+                "ORDER BY s.created_at DESC, s.id DESC";
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, DEFAULT_SETUP_USER_ID);
+            ps.setInt(2, gameVersionId);
+            ps.setString(3, buildLikeQuery(titleQuery));
+
+            return executeSetupSearch(ps);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in searchCommunitySetups: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Searches setups owned by one user by title across every track in one game.
+     * @param userId authenticated user id
+     * @param gameVersionId selected game version id
+     * @param titleQuery normalized title search text
+     * @return matching setup results with author username
+     */
+    public List<SetupSearchResult> searchSetupsByUser(int userId, int gameVersionId, String titleQuery)
+    {
+        String query = "SELECT s.*, u.username AS username FROM setup s " +
+                "INNER JOIN users u ON u.id = s.user_id " +
+                "WHERE s.user_id = ? AND s.game_version_id = ? AND LOWER(s.title) LIKE ? " +
+                "ORDER BY s.created_at DESC, s.id DESC";
+
+        try (Connection con = DatabaseUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(query))
+        {
+            ps.setInt(1, userId);
+            ps.setInt(2, gameVersionId);
+            ps.setString(3, buildLikeQuery(titleQuery));
+
+            return executeSetupSearch(ps);
+        }
+        catch (SQLException e)
+        {
+            System.err.println("[SetupDao] Error in searchSetupsByUser: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    private String buildLikeQuery(String titleQuery)
+    {
+        return "%" + titleQuery.toLowerCase() + "%";
+    }
+
+    private List<SetupSearchResult> executeSetupSearch(PreparedStatement ps) throws SQLException
+    {
+        List<SetupSearchResult> results = new ArrayList<>();
+
+        try (ResultSet rs = ps.executeQuery())
+        {
+            while (rs.next())
+            {
+                results.add(new SetupSearchResult(mapRowToSetup(rs), rs.getString("username")));
+            }
         }
 
-        return setups;
+        return results;
     }
 
     /**

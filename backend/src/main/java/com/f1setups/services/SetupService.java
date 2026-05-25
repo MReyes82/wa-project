@@ -1,5 +1,6 @@
 package com.f1setups.services;
 
+import com.f1setups.DTO.SetupSearchResult;
 import com.f1setups.dao.SetupDao;
 import com.f1setups.models.Setup;
 
@@ -62,14 +63,47 @@ public class SetupService
      * Default setups are excluded in the DAO layer.
      * @param game game version id
      * @param track track id
-     * @return matching community setups
+     * @return matching community setup results with author usernames
      * @throws Exception if the selected ids are invalid
      */
-    public List<Setup> getCommunitySetups(int game, int track) throws Exception
+    public List<SetupSearchResult> getCommunitySetups(int game, int track) throws Exception
     {
         validateSelection(game, track);
 
         return setupDao.getCommunitySetups(game, track);
+    }
+
+    /**
+     * Searches public community setups by title across every track for one game.
+     * Default setup templates are excluded in the DAO layer.
+     * @param game game version id
+     * @param query setup title search text
+     * @return matching community setup results with author usernames
+     * @throws Exception if arguments are invalid
+     */
+    public List<SetupSearchResult> searchCommunitySetups(int game, String query) throws Exception
+    {
+        validateGameId(game);
+        String normalizedQuery = normalizeSearchQuery(query);
+
+        return setupDao.searchCommunitySetups(game, normalizedQuery);
+    }
+
+    /**
+     * Searches setups owned by the authenticated user by title across every track for one game.
+     * @param authenticatedUserId user id extracted from the auth token
+     * @param game game version id
+     * @param query setup title search text
+     * @return matching user-owned setup results with author username
+     * @throws Exception if arguments are invalid
+     */
+    public List<SetupSearchResult> searchUserSetups(int authenticatedUserId, int game, String query) throws Exception
+    {
+        validateUserId(authenticatedUserId);
+        validateGameId(game);
+        String normalizedQuery = normalizeSearchQuery(query);
+
+        return setupDao.searchSetupsByUser(authenticatedUserId, game, normalizedQuery);
     }
 
     /**
@@ -183,10 +217,30 @@ public class SetupService
 
     private void validateSelection(int game, int track) throws Exception
     {
-        if (game <= 0 || track <= 0)
+        validateGameId(game);
+
+        if (track <= 0)
         {
-            throw new Exception("[SetupService] Game and track ids must be positive");
+            throw new Exception("[SetupService] Track id must be positive");
         }
+    }
+
+    private void validateGameId(int game) throws Exception
+    {
+        if (game <= 0)
+        {
+            throw new Exception("[SetupService] Game id must be positive");
+        }
+    }
+
+    private String normalizeSearchQuery(String query) throws Exception
+    {
+        if (query == null || query.isBlank())
+        {
+            throw new Exception("[SetupService] Search query cannot be empty");
+        }
+
+        return query.trim().toLowerCase();
     }
 
     private void validateUserId(int authenticatedUserId) throws Exception

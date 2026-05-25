@@ -75,6 +75,20 @@ public class SetupController implements HttpHandler
                 return;
             }
 
+            // Public community title search for the selected game across every track.
+            if ("GET".equalsIgnoreCase(method) && "/api/setups/community/search".equalsIgnoreCase(path))
+            {
+                searchCommunitySetups(httpExchange);
+                return;
+            }
+
+            // Authenticated title search for the current user's setups across every track in the selected game.
+            if ("GET".equalsIgnoreCase(method) && "/api/setups/me/search".equalsIgnoreCase(path))
+            {
+                searchUserSetups(httpExchange);
+                return;
+            }
+
             // Authenticated collection operations: list mine or create mine.
             if ("/api/setups/me".equalsIgnoreCase(path))
             {
@@ -158,6 +172,54 @@ public class SetupController implements HttpHandler
             int trackId = getRequiredIntParam(params, "trackId");
 
             sendJson(httpExchange, 200, setupService.getCommunitySetups(gameId, trackId));
+        }
+        catch (Exception e)
+        {
+            sendServiceError(httpExchange, e);
+        }
+    }
+
+    /**
+     * Handles public community setup title search for one game across every track.
+     * @param httpExchange active HTTP exchange
+     * @throws IOException if writing the response fails
+     */
+    private void searchCommunitySetups(HttpExchange httpExchange) throws IOException
+    {
+        try
+        {
+            Map<String, String> params = parseQueryParams(httpExchange.getRequestURI().getQuery());
+            int gameId = getRequiredIntParam(params, "gameId");
+            String query = getRequiredStringParam(params, "query");
+
+            sendJson(httpExchange, 200, setupService.searchCommunitySetups(gameId, query));
+        }
+        catch (Exception e)
+        {
+            sendServiceError(httpExchange, e);
+        }
+    }
+
+    /**
+     * Handles authenticated setup title search for the current user in one game across every track.
+     * @param httpExchange active HTTP exchange
+     * @throws IOException if writing the response fails
+     */
+    private void searchUserSetups(HttpExchange httpExchange) throws IOException
+    {
+        Integer authenticatedUserId = getAuthenticatedUserId(httpExchange);
+        if (authenticatedUserId == null)
+        {
+            return;
+        }
+
+        try
+        {
+            Map<String, String> params = parseQueryParams(httpExchange.getRequestURI().getQuery());
+            int gameId = getRequiredIntParam(params, "gameId");
+            String query = getRequiredStringParam(params, "query");
+
+            sendJson(httpExchange, 200, setupService.searchUserSetups(authenticatedUserId, gameId, query));
         }
         catch (Exception e)
         {
@@ -368,6 +430,23 @@ public class SetupController implements HttpHandler
         }
 
         return Integer.parseInt(value);
+    }
+
+    /**
+     * Reads a required string query parameter.
+     * @param params parsed query parameter map
+     * @param name parameter name
+     * @return trimmed parameter value
+     */
+    private String getRequiredStringParam(Map<String, String> params, String name)
+    {
+        String value = params.get(name);
+        if (value == null || value.isBlank())
+        {
+            throw new IllegalArgumentException("Missing required query parameter: " + name);
+        }
+
+        return value.trim();
     }
 
     /**
