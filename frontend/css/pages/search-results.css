@@ -13,6 +13,7 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 16px;
     align-items: end;
+    min-width: 0;
 }
 
 .search-form .input-group {
@@ -33,14 +34,20 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+    min-width: 0;
     padding: 20px;
     background-color: var(--card-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
 }
 
+.setup-list-card > div:first-child {
+    min-width: 0;
+}
+
 .setup-list-card h3 {
     margin: 10px 0 8px;
+    overflow-wrap: anywhere;
 }
 
 .setup-list-card p {
@@ -63,14 +70,45 @@
 }
 
 @media (max-width: 640px) {
+    .section-header > .btn-secondary {
+        width: 100%;
+    }
+
     .search-form,
     .setup-list-card {
         align-items: stretch;
         grid-template-columns: 1fr;
     }
 
+    .search-form .btn-primary {
+        width: 100%;
+    }
+
     .setup-list-card {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .setup-list-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .setup-list-actions .btn-primary,
+    .setup-list-actions .btn-secondary,
+    .setup-list-actions .btn-ghost {
+        flex: 1 1 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .setup-list-card {
+        padding: 16px;
+    }
+
+    .setup-list-actions .btn-primary,
+    .setup-list-actions .btn-secondary,
+    .setup-list-actions .btn-ghost {
+        flex-basis: 100%;
     }
 }

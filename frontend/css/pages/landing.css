@@ -1,6 +1,7 @@
 .landing-page {
     display: grid;
     align-items: center;
+    min-width: 0;
 }
 
 .landing-hero {
@@ -8,9 +9,11 @@
     grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
     align-items: center;
     gap: 40px;
+    min-width: 0;
 }
 
 .landing-copy {
+    min-width: 0;
     max-width: 660px;
 }
 
@@ -21,7 +24,7 @@
 .landing-copy h1 {
     max-width: 680px;
     margin-bottom: 16px;
-    font-size: clamp(2rem, 5vw, 4.2rem);
+    font-size: 4rem;
 }
 
 .landing-copy p {
@@ -34,6 +37,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    min-width: 0;
 }
 
 .landing-actions .btn-primary,
@@ -55,6 +59,7 @@
 .landing-visual {
     width: 100%;
     margin: 0;
+    min-width: 0;
 }
 
 .landing-visual img {
@@ -72,9 +77,42 @@
 @media (max-width: 820px) {
     .landing-hero {
         grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .landing-copy h1 {
+        font-size: 2.7rem;
     }
 
     .landing-visual img {
         min-height: 260px;
+    }
+}
+
+@media (max-width: 640px) {
+    .landing-actions .btn-primary,
+    .landing-actions .btn-secondary {
+        flex: 1 1 170px;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-copy h1 {
+        font-size: 2.1rem;
+    }
+
+    .landing-copy p {
+        margin-bottom: 22px;
+        font-size: 1rem;
+    }
+
+    .landing-actions .btn-primary,
+    .landing-actions .btn-secondary {
+        flex-basis: 100%;
+        min-width: 0;
+    }
+
+    .landing-visual img {
+        min-height: 210px;
     }
 }

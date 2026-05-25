@@ -203,6 +203,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initDashboardLogic() {
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarMenuButton = document.getElementById('btn-sidebar-menu');
+
+        if (sidebar && sidebarMenuButton) {
+            sidebarMenuButton.addEventListener('click', () => {
+                const isOpen = sidebar.classList.toggle('is-open');
+                sidebarMenuButton.setAttribute('aria-expanded', String(isOpen));
+                sidebarMenuButton.setAttribute('aria-label', isOpen ? 'Cerrar menu' : 'Abrir menu');
+            });
+        }
+
         bindClick('logout-button', () => {
             localStorage.removeItem(storageKeys.userId);
             localStorage.removeItem(storageKeys.authToken);
