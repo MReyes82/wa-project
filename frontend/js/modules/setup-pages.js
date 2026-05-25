@@ -142,17 +142,154 @@
                 document.querySelector('.setup-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
 
-            bindClick('btn-latest-community', () => {
-                navigateTo('see-community-setups');
-            });
-
-            bindClick('btn-latest-my', () => {
+            bindClick('btn-dashboard-my-search', () => {
                 if (requireAuth()) {
+                    saveDashboardSearch('my', 'dashboard-my-search');
                     navigateTo('see-my-setups');
                 }
             });
 
+            bindClick('btn-dashboard-community-search', () => {
+                saveDashboardSearch('community', 'dashboard-community-search');
+                navigateTo('see-community-setups');
+            });
+
             loadDefaultSetup();
+            loadDashboardLatestUserSetup();
+            loadDashboardCommunitySetups();
+        }
+
+        function saveDashboardSearch(source, inputId) {
+            const query = document.getElementById(inputId)?.value || '';
+
+            localStorage.setItem(storageKeys.setupSearchSource, source);
+            localStorage.setItem(storageKeys.setupSearchQuery, query.trim());
+        }
+
+        async function loadDashboardLatestUserSetup() {
+            const latestCard = document.getElementById('dashboard-latest-user-setup');
+            const latestButton = document.getElementById('btn-dashboard-latest-user');
+            const { gameId, trackId } = getCurrentSelection();
+
+            if (!latestCard || !latestButton) {
+                return;
+            }
+
+            if (!localStorage.getItem(storageKeys.authToken)) {
+                setDashboardLatestCard(latestCard, latestButton, null, 'Inicia sesion para ver tu ultimo setup.');
+                return;
+            }
+
+            try {
+                const setups = ui.asSetupArray(await getMySetups(gameId, trackId));
+                const latestSetup = sortSetupsByDate(setups)[0];
+
+                if (!latestSetup) {
+                    setDashboardLatestCard(latestCard, latestButton, null, 'No tienes setups guardados para esta pista.');
+                    return;
+                }
+
+                setDashboardLatestCard(latestCard, latestButton, latestSetup);
+            } catch (error) {
+                setDashboardLatestCard(latestCard, latestButton, null, error.message);
+            }
+        }
+
+        function setDashboardLatestCard(card, button, setup, fallbackMessage = '') {
+            const title = card.querySelector('h3');
+            const text = card.querySelector('p');
+
+            if (!setup) {
+                title.textContent = 'Ultimo setup agregado';
+                text.textContent = fallbackMessage;
+                button.disabled = true;
+                button.onclick = null;
+                return;
+            }
+
+            title.textContent = ui.getSetupTitle(setup);
+            text.textContent = `${ui.formatEnum(setup.sessionType)} / ${catalog.getTrackLabel(setup.trackId)} / ${catalog.getSetupWeatherLabel(setup)}`;
+            button.disabled = false;
+            button.onclick = () => {
+                openSetupRead(setup, setupSources.my);
+            };
+        }
+
+        async function loadDashboardCommunitySetups() {
+            const container = document.getElementById('dashboard-community-setups');
+            const { gameId, trackId } = getCurrentSelection();
+
+            if (!container) {
+                return;
+            }
+
+            container.textContent = '';
+
+            try {
+                const setups = sortSetupsByDate(ui.asSetupArray(await getCommunitySetups(gameId, trackId))).slice(0, 3);
+
+                if (!setups.length) {
+                    container.appendChild(createDashboardStatusCard('No hay registros de comunidad para esta pista.'));
+                    return;
+                }
+
+                setups.forEach(setup => {
+                    container.appendChild(createDashboardCommunityCard(setup));
+                });
+            } catch (error) {
+                container.appendChild(createDashboardStatusCard(error.message));
+            }
+        }
+
+        function createDashboardCommunityCard(setup) {
+            const card = document.createElement('article');
+            card.className = 'dashboard-card';
+
+            const author = document.createElement('div');
+            author.className = 'community-setup-author';
+
+            const emoji = document.createElement('span');
+            emoji.textContent = '👤';
+
+            const title = document.createElement('h3');
+            title.textContent = `Usuario ${setup.userId || '-'}`;
+
+            author.appendChild(emoji);
+            author.appendChild(title);
+
+            const details = document.createElement('p');
+            details.textContent = `${ui.formatEnum(setup.sessionType)} / ${catalog.getTrackLabel(setup.trackId)} / ${catalog.getSetupWeatherLabel(setup)}`;
+
+            const button = document.createElement('button');
+            button.className = 'btn-secondary';
+            button.type = 'button';
+            button.textContent = 'Ir al setup';
+            button.addEventListener('click', () => {
+                openSetupRead(setup, setupSources.community);
+            });
+
+            card.appendChild(author);
+            card.appendChild(details);
+            card.appendChild(button);
+
+            return card;
+        }
+
+        function createDashboardStatusCard(message) {
+            const card = document.createElement('article');
+            card.className = 'dashboard-card-status';
+            card.textContent = message;
+
+            return card;
+        }
+
+        function sortSetupsByDate(setups) {
+            return [...setups].sort((left, right) => {
+                const leftTime = new Date(left.createdAt || 0).getTime();
+                const rightTime = new Date(right.createdAt || 0).getTime();
+
+                return rightTime - leftTime;
+            });
         }
 
         function setListContext(elementId) {

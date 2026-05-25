@@ -38,55 +38,60 @@
             </div>
 
             <div class="quick-action-grid">
-                <button id="btn-see-community-setups" class="quick-action-card">
-                    <span>Comunidad</span>
-                    <strong>Ver registros</strong>
-                </button>
-                <button id="btn-see-my-setups" class="quick-action-card">
-                    <span>Mis setups</span>
-                    <strong>Administrar</strong>
+                <button id="btn-latest-default" class="quick-action-card">
+                    <span>Base</span>
+                    <strong>Ver setup base</strong>
                 </button>
                 <button id="btn-new-setup" class="quick-action-card">
                     <span>Nuevo registro</span>
                     <strong>Crear setup</strong>
                 </button>
+                <button id="btn-see-my-setups" class="quick-action-card">
+                    <span>Personal</span>
+                    <strong>Ver mis setups</strong>
+                </button>
             </div>
         </section>
 
-        <section class="latest-section">
+        <section class="garage-tools">
             <div class="section-header compact">
                 <div>
-                    <h2>Ultimos registros</h2>
-                    <p>Resumen rapido de registros disponibles para la seleccion actual.</p>
+                    <h2>Actividad y busqueda</h2>
+                    <p>Herramientas para revisar y encontrar registros de la seleccion actual.</p>
                 </div>
             </div>
 
-            <div class="latest-records">
-                <article class="record-card">
-                    <div>
-                        <span class="chip">Base</span>
-                        <h3>Setup base</h3>
-                        <p>Referencia inicial del circuito seleccionado.</p>
-                    </div>
-                    <button id="btn-latest-default" class="btn-secondary">Ver registro</button>
+            <div class="dashboard-card-grid">
+                <article id="dashboard-latest-user-setup" class="dashboard-card">
+                    <span class="chip">Personal</span>
+                    <h3>Ultimo setup agregado</h3>
+                    <p>Cargando registros...</p>
+                    <button id="btn-dashboard-latest-user" class="btn-secondary" disabled>Ir al setup</button>
                 </article>
-                <article class="record-card">
-                    <div>
-                        <span class="chip">Comunidad</span>
-                        <h3>Registros publicos</h3>
-                        <p>Setups compartidos por otros pilotos.</p>
-                    </div>
-                    <button id="btn-latest-community" class="btn-secondary">Ver registro</button>
+                <article class="dashboard-card search-card">
+                    <span class="chip">Mis setups</span>
+                    <h3>Buscar por nombre</h3>
+                    <input id="dashboard-my-search" type="search" placeholder="Nombre del setup">
+                    <button id="btn-dashboard-my-search" class="btn-secondary">Buscar</button>
                 </article>
-                <article class="record-card">
-                    <div>
-                        <span class="chip">Personal</span>
-                        <h3>Tus registros</h3>
-                        <p>Setups guardados con tu cuenta.</p>
-                    </div>
-                    <button id="btn-latest-my" class="btn-secondary">Ver registro</button>
+                <article class="dashboard-card search-card">
+                    <span class="chip">Comunidad</span>
+                    <h3>Buscar por nombre</h3>
+                    <input id="dashboard-community-search" type="search" placeholder="Nombre del setup">
+                    <button id="btn-dashboard-community-search" class="btn-secondary">Buscar</button>
                 </article>
             </div>
+        </section>
+
+        <section class="community-section">
+            <div class="section-header compact">
+                <div>
+                    <h2>Community setups</h2>
+                    <p>Ultimos registros compartidos para la pista actual.</p>
+                </div>
+            </div>
+
+            <div id="dashboard-community-setups" class="dashboard-card-grid"></div>
         </section>
 
         <section class="setup-panel">

@@ -84,7 +84,8 @@
 }
 
 .quick-actions,
-.latest-section,
+.garage-tools,
+.community-section,
 .setup-panel {
     min-width: 0;
 }
@@ -130,38 +131,63 @@
     font-size: 1.1rem;
 }
 
-.latest-records {
+.dashboard-card-grid {
     display: grid;
-    grid-auto-columns: minmax(320px, 1fr);
-    grid-auto-flow: column;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
-    overflow-x: auto;
-    padding-bottom: 4px;
 }
 
-.record-card {
+.dashboard-card {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    min-height: 148px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    min-height: 190px;
     padding: 20px;
     background-color: var(--card-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
 }
 
-.record-card h3 {
-    margin: 12px 0 8px;
+.dashboard-card h3 {
+    margin: 0;
 }
 
-.record-card p {
+.dashboard-card p {
     margin-bottom: 0;
 }
 
-.record-card .btn-secondary {
-    width: auto;
-    flex-shrink: 0;
+.dashboard-card .btn-secondary,
+.dashboard-card .btn-primary {
+    width: 100%;
+    margin-top: auto;
+}
+
+.dashboard-card .btn-secondary:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.dashboard-card input[type="search"] {
+    margin-top: auto;
+}
+
+.community-setup-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.community-setup-author span {
+    font-size: 1.5rem;
+}
+
+.dashboard-card-status {
+    min-height: 190px;
+    padding: 22px;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--text-muted);
 }
 
 .setup-panel {
@@ -299,7 +325,8 @@
         width: auto;
     }
 
-    .quick-action-grid {
+    .quick-action-grid,
+    .dashboard-card-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -309,12 +336,7 @@
         padding: 24px 18px;
     }
 
-    .record-card {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .latest-records {
-        grid-auto-columns: minmax(260px, 86vw);
+    .dashboard-card {
+        min-height: 170px;
     }
 }

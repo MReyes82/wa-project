@@ -8,7 +8,9 @@
         setupSource: 'f1_setup_view_source',
         setupMode: 'f1_setup_form_mode',
         selectedSetupId: 'f1_selected_setup_id',
-        selectedSetupJson: 'f1_selected_setup_json'
+        selectedSetupJson: 'f1_selected_setup_json',
+        setupSearchQuery: 'f1_setup_search_query',
+        setupSearchSource: 'f1_setup_search_source'
     };
 
     const setupSources = {
