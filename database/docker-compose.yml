@@ -3,7 +3,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql-8.0
-    restart: always                       # always restart
+    restart: unless-stopped                       # always restart
     environment:
       MYSQL_DATABASE: 'wa-project'              # name of database
       MYSQL_USER: 'server'                # sample is the name of user
