@@ -1,5 +1,4 @@
-// Keep the backend root in one place. Main.java starts the server at localhost:8080
-// and registers the API contexts under /api.
+// Keep the backend root in one place. The PHP backend serves API routes under /api.
 const API_BASE_URL = 'http://localhost:8080/api';
 
 // Read the response body once and parse it as JSON when possible.

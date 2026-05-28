@@ -1,18 +1,15 @@
-# Backend
-
-## Unit tests
+## Pruebas Unitarias
 
 ```bash
 cd /home/mreyes/Desktop/wa-project/backend
 mvn test
 ```
 
-## Integration tests (Testcontainers)
+## Pruebas de Integración con Testcontainers
 
-These tests start a temporary MySQL container and run DAO operations against it. You need Docker running.
+Estas pruebas levantan un contenedor temporal de MySQL y ejecutan operaciones DAO contra esa base de datos. Se necesita Docker corriendo.
 
 ```bash
 cd /home/mreyes/Desktop/wa-project/backend
 mvn -DskipITs=false verify
 ```
-

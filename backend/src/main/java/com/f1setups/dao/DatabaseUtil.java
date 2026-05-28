@@ -77,6 +77,7 @@ public class DatabaseUtil
                 if (dataSource == null)
                 {
                     HikariConfig config = new HikariConfig();
+                    config.setDriverClassName("com.mysql.cj.jdbc.Driver");
                     config.setJdbcUrl("jdbc:mysql://localhost:3306/f1setups");
                     config.setUsername("root");
                     config.setPassword("password");

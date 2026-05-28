@@ -1,2 +1,1 @@
-This package contains the clases used as Data Transfer Objects
-in the `services` and `controllers` packages
+Este paquete contiene las clases usadas como objetos de transferencia de datos entre los paquetes `services` y `controllers`.

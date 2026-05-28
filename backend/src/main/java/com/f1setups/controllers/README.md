@@ -1,2 +1,1 @@
-This package includes the controllers
-for the application. This is the core of the API.
+Este paquete contiene los controladores de la aplicación. Aquí se define la capa principal de la API.

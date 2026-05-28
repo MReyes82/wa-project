@@ -269,7 +269,10 @@ class SetupDaoTest
 
         DatabaseUtil.setConnectionProvider(() -> con);
 
-        when(con.prepareStatement("SELECT * FROM setup WHERE user_id <> ? AND game_version_id = ? AND track_id = ?"))
+        when(con.prepareStatement("SELECT s.*, u.username AS username FROM setup s " +
+                "INNER JOIN users u ON u.id = s.user_id " +
+                "WHERE s.user_id <> ? AND s.game_version_id = ? AND s.track_id = ? " +
+                "ORDER BY s.created_at DESC, s.id DESC"))
                 .thenReturn(ps);
         when(ps.executeQuery()).thenReturn(rs);
         when(rs.next()).thenReturn(true, false);
@@ -281,7 +284,7 @@ class SetupDaoTest
         var setups = setupDao.getCommunitySetups(4, 19);
 
         assertEquals(1, setups.size());
-        assertEquals(15, setups.get(0).getId());
+        assertEquals(15, setups.get(0).setup.getId());
         verify(ps).setInt(1, 1);
         verify(ps).setInt(2, 4);
         verify(ps).setInt(3, 19);

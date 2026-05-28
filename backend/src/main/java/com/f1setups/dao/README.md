@@ -1,4 +1,3 @@
-This package contains the Data Access Objects
-needed for the CRUD operations.
-All DAO packages need to implement the defined methods at the 
-DAO interface
+Este paquete contiene los objetos de acceso a datos necesarios para las operaciones CRUD.
+
+Todas las clases DAO deben implementar los métodos definidos en la interfaz `Dao`.
