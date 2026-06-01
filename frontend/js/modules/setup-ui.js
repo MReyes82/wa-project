@@ -393,8 +393,7 @@
             ['Pista', catalog.getTrackLabel(trackId)],
             ['Sesion', formatEnum(setup.sessionType)],
             ['Control', formatEnum(setup.controllerType)],
-            ['Clima', catalog.getSetupWeatherLabel(setup)],
-            ['Creado', formatDate(setup.createdAt)]
+            ['Clima', catalog.getSetupWeatherLabel(setup)]//, ['Creado', formatDate(setup.createdAt)]
         ].forEach(([label, value]) => {
             setupMeta.appendChild(createSetupField(label, value));
         });
