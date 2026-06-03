@@ -939,6 +939,8 @@
         }
 
         function configureRangeInputs(gameId) {
+            const engineBrakingGameId = window.F1SetupRanges?.gameIds?.f1_24 || '3';
+
             numericSetupFields.forEach(fieldName => {
                 const input = document.querySelector(`[name="${fieldName}"]`);
                 const rule = window.F1SetupRanges?.getFieldRule(gameId, fieldName);
@@ -950,6 +952,11 @@
                 const inputGroup = input.closest('.input-group');
                 if (inputGroup) {
                     inputGroup.dataset.setupField = fieldName;
+                }
+
+                if (fieldName === 'engineBraking' && String(gameId) !== engineBrakingGameId) {
+                    hideUnavailableRangeField(inputGroup, input, fieldName);
+                    return;
                 }
 
                 if (!rule.available) {

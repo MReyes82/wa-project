@@ -401,6 +401,9 @@
         const setupGroupsContainer = document.createElement('div');
         setupGroupsContainer.className = 'setup-groups';
 
+        const engineBrakingGameId = window.F1SetupRanges?.gameIds?.f1_24 || '3';
+        const showEngineBraking = String(gameId) === engineBrakingGameId;
+
         config.setupGroups.forEach(group => {
             const groupElement = document.createElement('article');
             groupElement.className = 'setup-group';
@@ -410,6 +413,10 @@
             groupElement.appendChild(groupTitle);
 
             group.fields.forEach(([label, property]) => {
+                if (property === 'engineBraking' && !showEngineBraking) {
+                    return;
+                }
+
                 groupElement.appendChild(createSetupField(label, setup[property]));
             });
 
@@ -451,6 +458,9 @@
             readMeta.appendChild(createReadField(label, value));
         });
 
+        const engineBrakingGameId = window.F1SetupRanges?.gameIds?.f1_24 || '3';
+        const showEngineBraking = String(gameId) === engineBrakingGameId;
+
         config.setupGroups.forEach(group => {
             const groupElement = document.createElement('article');
             groupElement.className = 'read-group';
@@ -460,6 +470,10 @@
             groupElement.appendChild(groupTitle);
 
             group.fields.forEach(([label, property]) => {
+                if (property === 'engineBraking' && !showEngineBraking) {
+                    return;
+                }
+
                 const row = createReadRangeRow(label, setup[property], gameId, property);
 
                 if (row) {
